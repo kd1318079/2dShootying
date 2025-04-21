@@ -27,7 +27,7 @@ public:
 	//’e‚ÌŽí—Þ
 	int BulletCnt = 30;			//Ž©“®
 	int SubBulletCnt = Chain;		//Žè“®
-	int SPBulletCnt = RailGun;	//“ÁŽê
+	int SPBulletCnt = Return;	//“ÁŽê
 
 	int MissileCnt = 0;
 	Math::Vector2 SetMove(Math::Vector2 A) { Move = A; };

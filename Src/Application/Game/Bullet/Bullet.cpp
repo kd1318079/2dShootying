@@ -380,7 +380,7 @@ void Bullet::ATRailGun(Math::Vector2 A)
 
 void Bullet::ATChain(Math::Vector2 A)
 {
-	Attack = 5;
+	Attack = 2;
 	float Spd;
 	Spd = 10;
 	Move = { Spd,Spd };
@@ -389,6 +389,42 @@ void Bullet::ATChain(Math::Vector2 A)
 	HomingDir = A;
 	//Ž©‹@‚ÌˆÚ“®‚ÉŽáŠ±‰e‹¿‚ðŽó‚¯‚é‚æ‚¤‚É
 	Move += PLAYER.GetMove() / 10;
+}
+
+void Bullet::ATVirus(Math::Vector2 A)
+{
+}
+
+void Bullet::ATMoon(Math::Vector2 A)
+{
+}
+
+void Bullet::ATCommet(Math::Vector2 A)
+{
+}
+
+void Bullet::ATSun(Math::Vector2 A)
+{
+}
+
+void Bullet::ATReturn(Math::Vector2 A)
+{
+}
+
+void Bullet::ATPoizon(Math::Vector2 A)
+{
+}
+
+void Bullet::ATConti(Math::Vector2 A)
+{
+}
+
+void Bullet::ATSDust(Math::Vector2 A)
+{
+}
+
+void Bullet::ATSLight(Math::Vector2 A)
+{
 }
 
 void Bullet::DecreCh()

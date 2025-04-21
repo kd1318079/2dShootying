@@ -9,7 +9,6 @@ class Application
 {
 // メンバ
 public:
-
 	// アプリケーション実行
 	void Execute();
 

@@ -41,6 +41,15 @@ private:
 	void ATHoming(Math::Vector2 A);
 	void ATRailGun(Math::Vector2 A);
 	void ATChain(Math::Vector2 A);
+	void ATVirus(Math::Vector2 A);
+	void ATMoon(Math::Vector2 A);
+	void ATCommet(Math::Vector2 A);
+	void ATSun(Math::Vector2 A);
+	void ATReturn(Math::Vector2 A);
+	void ATPoizon(Math::Vector2 A);
+	void ATConti(Math::Vector2 A);
+	void ATSDust(Math::Vector2 A);
+	void ATSLight(Math::Vector2 A);
 
 	int TexNo = 0;
 	int Attack = 1;
