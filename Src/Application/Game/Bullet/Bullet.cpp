@@ -12,9 +12,13 @@ Bullet::Bullet(int A)
 	PlayerDeg = PLAYER.GetPDeg();
 	MoveRad = M;
 	BTex = BuTEX.GetTex(A);
-
-
 	BulletType = A;
+	if (BulletType == Commet)
+	{
+		M.x = cos(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 16 - 8)));
+		M.y = sin(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 16 - 8)));
+	}
+
 	//‰Šú’l‚Ìİ’è
 	switch (BulletType)
 	{
@@ -63,6 +67,33 @@ Bullet::Bullet(int A)
 		break;
 	case Chain:
 		ATChain(M);
+		break;
+	case Virus:
+		ATVirus(M);
+		break;
+	case Moon:
+		ATMoon(M);
+		break;
+	case Commet:
+		ATCommet(M);
+		break;
+	case Sun:
+		ATSun(M);
+		break;
+	case Return:
+		ATReturn(M);
+		break;
+	case Poizon:
+		ATPoizon(M);
+		break;
+	case Conti:
+		ATConti(M);
+		break;
+	case SDust:
+		ATSDust(M);
+		break;
+	case SLight:
+		ATSLight(M);
 		break;
 	default:
 		break;
@@ -393,38 +424,117 @@ void Bullet::ATChain(Math::Vector2 A)
 
 void Bullet::ATVirus(Math::Vector2 A)
 {
+	Attack = 10;
+	float Spd;
+	Spd = 6;
+	Move = { Spd,Spd };
+	//ˆÚ“®—Ê‚ÉŠp“x‚ğæZ
+	Move *= A;
+	HomingDir = A;
+	//©‹@‚ÌˆÚ“®‚ÉáŠ±‰e‹¿‚ğó‚¯‚é‚æ‚¤‚É
+	Move += PLAYER.GetMove() / 10;
+	VirusF = true;
 }
 
 void Bullet::ATMoon(Math::Vector2 A)
 {
+	Attack = 5;
+	float Spd;
+	Spd = 10;
+	Move = { Spd,Spd };
+	//ˆÚ“®—Ê‚ÉŠp“x‚ğæZ
+	Move *= A;
+	HomingDir = A;
+	//©‹@‚ÌˆÚ“®‚ÉáŠ±‰e‹¿‚ğó‚¯‚é‚æ‚¤‚É
+	Move += PLAYER.GetMove() / 10;
+	MoonF = true;
 }
 
 void Bullet::ATCommet(Math::Vector2 A)
 {
+	Attack = 2;
+	float Spd;
+	Spd = 10;
+	Spd += (rand() % 10 - 5) / 100; 
+	Move = { Spd,Spd };
+	//ˆÚ“®—Ê‚ÉŠp“x‚ğæZ
+	Move *= A;
+	HomingDir = A;
+
+	//©‹@‚ÌˆÚ“®‚ÉáŠ±‰e‹¿‚ğó‚¯‚é‚æ‚¤‚É
+	Move += PLAYER.GetMove() / 10;
 }
 
 void Bullet::ATSun(Math::Vector2 A)
 {
+	Attack = 2;
+	float Spd;
+	Spd = 6;
+	Move = { Spd,Spd };
+	//ˆÚ“®—Ê‚ÉŠp“x‚ğæZ
+	Move *= A;
+	HomingDir = A;
+	//©‹@‚ÌˆÚ“®‚ÉáŠ±‰e‹¿‚ğó‚¯‚é‚æ‚¤‚É
+	Move += PLAYER.GetMove() / 10;
+	SunF = true;
 }
 
 void Bullet::ATReturn(Math::Vector2 A)
 {
+	Attack = 2;
+	float Spd;
+	Spd = 6;
+	Move = { Spd,Spd };
+	//ˆÚ“®—Ê‚ÉŠp“x‚ğæZ
+	Move *= A;
+	HomingDir = A;
+	//©‹@‚ÌˆÚ“®‚ÉáŠ±‰e‹¿‚ğó‚¯‚é‚æ‚¤‚É
+	Move += PLAYER.GetMove() / 10;
 }
 
 void Bullet::ATPoizon(Math::Vector2 A)
 {
+	Attack = 2;
+	float Spd;
+	Spd = 6;
+	Move = { Spd,Spd };
+	//ˆÚ“®—Ê‚ÉŠp“x‚ğæZ
+	Move *= A;
+	HomingDir = A;
+	//©‹@‚ÌˆÚ“®‚ÉáŠ±‰e‹¿‚ğó‚¯‚é‚æ‚¤‚É
+	Move += PLAYER.GetMove() / 10;
+	PoizonF = true;
 }
 
 void Bullet::ATConti(Math::Vector2 A)
 {
+	Attack = 2;
+	float Spd;
+	Spd = 6;
+	Move = { Spd,Spd };
+	//ˆÚ“®—Ê‚ÉŠp“x‚ğæZ
+	Move *= A;
+	HomingDir = A;
+	//©‹@‚ÌˆÚ“®‚ÉáŠ±‰e‹¿‚ğó‚¯‚é‚æ‚¤‚É
+	Move += PLAYER.GetMove() / 10;
 }
 
 void Bullet::ATSDust(Math::Vector2 A)
 {
+	Attack = 2;
+	float Spd;
+	Spd = 20;
+	Move = { Spd,Spd };
+	//ˆÚ“®—Ê‚ÉŠp“x‚ğæZ
+	Move *= A;
+	HomingDir = A;
+	//©‹@‚ÌˆÚ“®‚ÉáŠ±‰e‹¿‚ğó‚¯‚é‚æ‚¤‚É
+	Move += PLAYER.GetMove() / 10;
 }
 
 void Bullet::ATSLight(Math::Vector2 A)
 {
+	
 }
 
 void Bullet::DecreCh()

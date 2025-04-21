@@ -36,6 +36,9 @@ void Scene::ImGuiUpdate()
 		ImGui::Text("FPS : %d", APP.m_fps);
 		ImGui::Text("DisCnt : %d", PLAYER.ECnt);
 		ImGui::Text("PlayerSpd : %f", PLAYER.GetSpd());
+		ImGui::Text("PlayerEnergy : %d", PLAYER.GetEnergy());
+		ImGui::Text("ContiCnt : %d", PLAYER.ContiCnt);
+		if(GM.MobEnemy.size() == 1)ImGui::Text("Enmey HP : %d", GM.MobEnemy[0]->HP);
 	}
 	ImGui::End();
 }

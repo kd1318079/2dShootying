@@ -26,7 +26,7 @@ public:
 	Math::Vector2 ExpPos = { 0,0 };
 	//’e‚ÌŽí—Þ
 	int BulletCnt = 30;			//Ž©“®
-	int SubBulletCnt = Chain;		//Žè“®
+	int SubBulletCnt = Commet;		//Žè“®
 	int SPBulletCnt = Return;	//“ÁŽê
 
 	int MissileCnt = 0;
@@ -64,8 +64,13 @@ public:
 	
 	int LaesrCnt = 0;
 
+	int ContiCnt = 0;
 private:
+	int HP = 10;
+	int DEF = 5;
+	int Energy = 100;
 
+	int EnergyMax = 100;
 
 	KdTexture* PlayerTex;
 	KdTexture AimeTex;
@@ -139,6 +144,13 @@ private:
 	void AutoAT();
 
 public:
+	int		GetHP()			{ return HP; }
+	int		GetDEF()		{ return DEF; }
+	int		GetEnergy()		{ return Energy; }
+	void	SetHP(int A)	{  HP = A; }
+	void	SetDEF(int A)	{ DEF = A; }
+	void	SetEnergy(int A){ Energy = A ; }
+
 
 	float GetSpd() 	{return PlayerSpd; };
 	float GetPDeg() 	{return PlayerDeg; };

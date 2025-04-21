@@ -380,35 +380,35 @@ void C_Player::ScrollMax()
 
 void C_Player::ATerase()
 {
-	if (MainBullet.size() >= 80)
+	if (MainBullet.size() >= 150)
 	{
 		while (MainBullet.size() >= 80)
 		{
 			MainBullet.erase(MainBullet.begin());
 		}
 	}
-	if (SubBullet.size() >= 50)
+	if (SubBullet.size() >= 150)
 	{
 		while (SubBullet.size() >= 50)
 		{
 			SubBullet.erase(SubBullet.begin());
 		}
 	}
-	if (SPBullet.size() >= 20)
+	if (SPBullet.size() >= 150)
 	{
 		while (SPBullet.size() >= 20)
 		{
 			SPBullet.erase(SPBullet.begin());
 		}
 	}
-	if (BurstBullet.size() >= 120)
+	if (BurstBullet.size() >= 150)
 	{
 		while (BurstBullet.size() >= 120)
 		{
 			BurstBullet.erase(BurstBullet.begin());
 		}
 	}
-	if (BulletExp.size() >= 200) {
+	if (BulletExp.size() >= 400) {
 		BulletExp.erase(BulletExp.begin(), BulletExp.begin() + (BulletExp.size() - 199));
 	}
 	for (auto A = BulletExp.begin(); A != BulletExp.end(); ) {
@@ -529,7 +529,9 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 	else if (A == Commet)
 	{
 		Bu.push_back(new Bullet(A));
-		return 10;
+		Bu.push_back(new Bullet(A));
+		Bu.push_back(new Bullet(A));
+		return 4;
 	}
 	else if (A == Sun)
 	{
@@ -563,7 +565,6 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 	}
 
 	return B;
-	
 }
 
 void C_Player::Attack2(std::vector<Bullet*>& Bu, int A, int* B, bool* F)

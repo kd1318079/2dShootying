@@ -34,8 +34,16 @@ public:
 	bool Death = false;
 	//空間分割で当たり判定を行うため
 	Cell EHitJ;
+
+	//ウイルス
+	bool Virus = false;
+	int VirusCnt = 0;
+	//毒
+	bool Poizon = false;
+	int PoizonCnt = 0;
+
+	int HP = 200;
 private:
-	int HP = 2;
 	int ATK;
 	int DEF;
 	
@@ -61,6 +69,13 @@ private:
 	Math::Vector2 PScale;
 
 	long double Deg = 0;
+	
+	int ContiCnt = 0;
+	//状態異常Update
+	void Condisyon();
+
+	//死亡時　基本はExpをtrueにするボスだけ例外処理
+	void DeathUpdate(Enemy* A);
 public:
 	Math::Vector2 GetPos() { return Pos; }
 };

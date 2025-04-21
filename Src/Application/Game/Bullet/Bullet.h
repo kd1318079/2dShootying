@@ -23,6 +23,11 @@ public:
 	Math::Vector2 HomingE = {0,0};
 	Enemy* HomingEnemy;
 	Math::Vector2 HomingDir = { 0,0 };
+
+	bool VirusF = false;
+	bool MoonF = false;
+	bool SunF = false;
+	bool PoizonF = false;
 private:
 	float AutoDeg = 0;
 	//‰Šú’l‚Ìİ’è //ˆÚ“®—Ê‚Ìİ’è

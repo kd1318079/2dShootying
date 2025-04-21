@@ -7,6 +7,8 @@
 Enemy::Enemy(int A)
 {
 	//Aは敵の種類を指定
+	ATK = 1;
+	DEF = 1;
 	ETex = ENEMYTEX.GetTex(0);
 	Pos = {(float)(rand() % 1280 - 640),(float)(rand() % 720 - 360)};
 	Move = { 0,0 };
@@ -32,11 +34,7 @@ void Enemy::Update()
 					{
 						HP -= A->GetATK();
 						Hit = true;
-						if (HP <= 0)
-						{
-							HP = 0;
-							Exp = true;
-						}
+						DeathUpdate(this);
 					}
 
 				}
@@ -61,11 +59,7 @@ void Enemy::Update()
 				Dmg--;
 				if (Dmg <= 0)Dmg = 1;
 				A->HP -= Dmg;
-				if (A->HP <= 0)
-				{
-					A->HP = 0;
-					A->Exp = true;
-				}
+				DeathUpdate(A);
 				A->Hit = true;
 			}
 			ChainEnemy.clear();
@@ -91,10 +85,10 @@ void Enemy::Update()
 		}
 	}
 
+	Condisyon();
 	Main = Pos - PLAYER.GetScroll();
 
 	MatSet();
-
 }
 
 void Enemy::Draw()
@@ -121,7 +115,46 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
         {
 			if (SCENE.HitJudge(Pos, (*A)->GetPos(), 64))
 			{
-				HP -= (*A)->GetATK();
+				//ダメージ計算
+				float Dmg = (*A)->GetATK() - DEF;
+				//連続の時
+				if ((*A)->BulletType == Conti)
+				{
+					PLAYER.ContiCnt++;
+					Dmg += PLAYER.ContiCnt / 20;
+				}
+				else PLAYER.ContiCnt = 0;
+
+				//感染時
+				if (Virus)Dmg = (*A)->GetATK() * 1.2 - DEF;
+				//守備無視
+				if ((*A)->MoonF) Dmg = (*A)->GetATK();
+				
+				//状態異常※ウイルス
+				if ((*A)->VirusF)
+				{
+					Virus = true;
+					VirusCnt = 500;
+				}
+				//状態異常※毒
+				if ((*A)->PoizonF)
+				{
+					Poizon = true;
+					PoizonCnt = 30;
+				}
+
+				//最低値保証
+				if (Dmg <= 0)Dmg = 1;
+				HP -= Dmg;
+
+
+				//エネルギー回復
+				if ((*A)->SunF)
+				{
+					PLAYER.SetEnergy(PLAYER.GetEnergy() + (int)Dmg);
+				}
+
+
 				Hit = true;
 				if ((*A)->BulletType == Chain)
 				{
@@ -280,9 +313,6 @@ bool Enemy::ChainHit(Math::Vector2 ChP)
 	return true;
 }
 
-
-
-
 void Enemy::MatSet()
 {
 	Trans = Math::Matrix::CreateTranslation(Main.x, Main.y, 0);
@@ -290,4 +320,30 @@ void Enemy::MatSet()
 	Scale = Math::Matrix::CreateScale(PScale.x, PScale.y, 0);
 
 	Mat = Rota * Scale * Trans;
+}
+
+void Enemy::Condisyon()
+{
+	if (Virus)
+	{
+		VirusCnt--;
+		if (VirusCnt < 0)Virus = false;
+	}
+	if (Poizon)
+	{
+		HP--;
+		DeathUpdate(this);
+
+		PoizonCnt--;
+		if (PoizonCnt < 0)Poizon = false;
+	}
+}
+
+void Enemy::DeathUpdate(Enemy* A)
+{
+	if (A->HP <= 0)
+	{
+		A->HP = 0;
+		A->Exp = true;
+	}
 }
