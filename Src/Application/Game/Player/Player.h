@@ -26,8 +26,8 @@ public:
 	Math::Vector2 ExpPos = { 0,0 };
 	//’e‚ÌŽí—Þ
 	int BulletCnt = 30;			//Ž©“®
-	int SubBulletCnt = Commet;		//Žè“®
-	int SPBulletCnt = Return;	//“ÁŽê
+	int SubBulletCnt = Fire;		//Žè“®
+	int SPBulletCnt = Gravity;	//“ÁŽê
 
 	int MissileCnt = 0;
 	Math::Vector2 SetMove(Math::Vector2 A) { Move = A; };
@@ -99,10 +99,9 @@ private:
 	bool MissileM = false;
 	bool MissileS = false;
 
-	void BurstDegF();
 	void FireExpF();
+
 	void LaesrFCnt();
-	void GraviFCnt();
 
 	bool LaesrF = false;
 	const int LeasrMax = 60;

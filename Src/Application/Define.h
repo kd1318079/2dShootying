@@ -29,16 +29,14 @@ typedef enum
 	Homing,
 	RailGun,
 	Chain,
-
 	Virus,
 	Moon,
 	Commet,
 	Sun,
-	Return,
 	Poizon,
 	Conti,
 	SDust,
-	SLight
+	 SLight
 }BulletTypeNum;
 
 #define Cell Cell

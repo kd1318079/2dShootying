@@ -80,9 +80,6 @@ Bullet::Bullet(int A)
 	case Sun:
 		ATSun(M);
 		break;
-	case Return:
-		ATReturn(M);
-		break;
 	case Poizon:
 		ATPoizon(M);
 		break;
@@ -154,7 +151,7 @@ void Bullet::Update()
 		}
 	}
 	if (APP.count % 2 == 0)CELLGET(Pos, &BHitJ);
-	if (BulletType == Burst || BulletType == Fire)DecreCh();
+	if (BulletType == Burst || BulletType == Fire || BulletType == SDust ||BulletType == Gravity)DecreCh();
 	if (BulletType == Homing && !HomingF)
 	{
 		for (auto A : GM.MobEnemy)
@@ -213,7 +210,15 @@ void Bullet::Update()
 			Move = { 8.0f, 0.0f }; // ƒfƒtƒHƒ‹ƒg“®ìi’¼ij
 		}
 	}
-	
+	if (BulletType == SDust && SDCnt >= 0)
+	{
+		SDCnt--;
+		if (SDCnt < 0)
+		{
+			SDCnt = 0;
+			SDF = true;
+		}
+	}
 
 	Pos += Move;	
 	Main = Pos - PLAYER.GetScroll();
@@ -322,6 +327,8 @@ void Bullet::ATBurstP(Math::Vector2 A)
 	Pos = PLAYER.BurstPos;
 	BurstDeg = PLAYER.BurstDeg;
 	Move = { Spd,Spd };
+	A.x = cos(ToRadians(BurstDeg));
+	A.y = sin(ToRadians(BurstDeg));
 	//ˆÚ“®—Ê‚ÉŠp“x‚ðæŽZ
 	Move *= A;
 	//Ž©‹@‚ÌˆÚ“®‚ÉŽáŠ±‰e‹¿‚ðŽó‚¯‚é‚æ‚¤‚É
@@ -366,7 +373,7 @@ void Bullet::ATFire(Math::Vector2 A)
 
 void Bullet::ATLaesr(Math::Vector2 A)
 {
-	Attack = 2;
+	Attack = 10;
 	Pos = PLAYER.GetPos();
 	Deg = PLAYER.GetPDeg();
 	BTex = BuTEX.GetLaserTex();
@@ -479,19 +486,6 @@ void Bullet::ATSun(Math::Vector2 A)
 	SunF = true;
 }
 
-void Bullet::ATReturn(Math::Vector2 A)
-{
-	Attack = 2;
-	float Spd;
-	Spd = 6;
-	Move = { Spd,Spd };
-	//ˆÚ“®—Ê‚ÉŠp“x‚ðæŽZ
-	Move *= A;
-	HomingDir = A;
-	//Ž©‹@‚ÌˆÚ“®‚ÉŽáŠ±‰e‹¿‚ðŽó‚¯‚é‚æ‚¤‚É
-	Move += PLAYER.GetMove() / 10;
-}
-
 void Bullet::ATPoizon(Math::Vector2 A)
 {
 	Attack = 2;
@@ -530,6 +524,7 @@ void Bullet::ATSDust(Math::Vector2 A)
 	HomingDir = A;
 	//Ž©‹@‚ÌˆÚ“®‚ÉŽáŠ±‰e‹¿‚ðŽó‚¯‚é‚æ‚¤‚É
 	Move += PLAYER.GetMove() / 10;
+	SDCnt = 15;
 }
 
 void Bullet::ATSLight(Math::Vector2 A)
@@ -539,16 +534,23 @@ void Bullet::ATSLight(Math::Vector2 A)
 
 void Bullet::DecreCh()
 {
+	GraCnt--;
 	BurstCnt--;
 	FireCnt--;
+	SDCnt--;
 	if (BurstCnt <= 0 && BulletType == Burst)
 	{
 		BurstF = true;
 	}
-	if (FireCnt <= 0 && BulletType == Fire)
+	else if (FireCnt <= 0 && BulletType == Fire)
 	{
 		FireF = true;
 	}
+	else if (SDCnt <= 0 && SDCnt == SDust)
+	{
+		SDF = true;
+	}
+
 
 }
 

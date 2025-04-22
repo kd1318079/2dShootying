@@ -169,8 +169,10 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
 				}
 				PLAYER.ExpPos = (*A)->GetPos();
 				// Bu‚©‚çA‚ðíœ
+
 				if((*A)->BulletType == Fire) PLAYER.BulletExp.push_back(new Explosion(120,2));
 				else if ((*A)->BulletType == Gravity) PLAYER.BulletExp.push_back(new Explosion(120,5));
+				else if((*A)->BulletType == SDust)PLAYER.BulletExp.push_back(new Explosion(60,10));
 				else PLAYER.BulletExp.push_back(new Explosion(40));
 				if (HP <= 0)
 				{

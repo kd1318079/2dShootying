@@ -12,10 +12,12 @@ public:
 	void Draw();
 	void Update();
 
-	bool BurstF = false;
 	int BulletType = 0;
 
+	bool BurstF = false;
 	bool FireF = false;
+	bool SDF = false;
+
 	int GraCnt = 0;
 
 	bool HomingF = false;
@@ -50,7 +52,6 @@ private:
 	void ATMoon(Math::Vector2 A);
 	void ATCommet(Math::Vector2 A);
 	void ATSun(Math::Vector2 A);
-	void ATReturn(Math::Vector2 A);
 	void ATPoizon(Math::Vector2 A);
 	void ATConti(Math::Vector2 A);
 	void ATSDust(Math::Vector2 A);
@@ -67,6 +68,8 @@ private:
 
 	float BurstDeg = 0;
 	int BurstCnt = 0;
+	int SDCnt = 0;
+
 	void DecreCh();
 
 	int FireCnt = 0;

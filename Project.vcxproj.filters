@@ -58,6 +58,9 @@
     <Filter Include="Src\Application\Game\Explosion">
       <UniqueIdentifier>{b451ce6c-441a-4d44-b941-bc55a79a12dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\Game\UI">
+      <UniqueIdentifier>{0913127f-71f0-4113-8db9-9b958d4682eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">
@@ -186,6 +189,12 @@
     <ClInclude Include="Src\Application\Game\Explosion\ExpTexLoad.h">
       <Filter>Src\Application\Game\Explosion</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Application\Game\UI\UI.h">
+      <Filter>Src\Application\Game\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\Game\UI\BaseUI.h">
+      <Filter>Src\Application\Game\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Pch.cpp">
@@ -265,6 +274,12 @@
     </ClCompile>
     <ClCompile Include="Src\Application\Game\Explosion\Explosion.cpp">
       <Filter>Src\Application\Game\Explosion</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Game\UI\UI.cpp">
+      <Filter>Src\Application\Game\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Game\UI\BaseUI.cpp">
+      <Filter>Src\Application\Game\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

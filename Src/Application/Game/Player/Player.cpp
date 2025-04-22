@@ -246,10 +246,12 @@ void C_Player::PlayerAttack()
 	if(MissileM)Attack2(MainBullet, BulletCnt ,&MainBulletTime , &MissileM);
 	if(MissileS)Attack2(SubBullet, SubBulletCnt,&SubBulletTime , &MissileS);
 
-	BurstDegF();
 	FireExpF();
+	//BurstDegF();
+	//GraviFCnt();
+	//SterD();
+
 	if(LaesrF)LaesrFCnt();
-	GraviFCnt();
 
 	for (auto Main : MainBullet)	Main->Update();
 	for (auto Sub : SubBullet)		Sub->Update();
@@ -279,33 +281,6 @@ void C_Player::SetMat()
 	Mat = Scale * Rota * Trans;
 }
 
-void C_Player::BurstDegF()
-{
-	auto BurstFlg = [](std::vector<Bullet*>& Bu) -> void
-		{
-			for (auto A = Bu.begin(); A != Bu.end(); )
-			{
-				PLAYER.BurstDeg = 0;
-				if ((*A)->BurstF)
-				{
-					PLAYER.BurstPos = (*A)->GetPos();
-					// BuからAを削除
-					A = Bu.erase(A); // イテレータを次の要素に進める炸裂
-					for (int i = 0; i < PLAYER.BurstMax; i++)
-					{
-						PLAYER.BurstDeg += 360 / PLAYER.BurstMax;
-						PLAYER.BurstBullet.push_back(new Bullet(BurstP));
-					}
-					continue; // erase後はAをインクリメントしない
-				}
-				++A; // 次の要素へ進む
-			}
-		};
-	BurstFlg(MainBullet);
-	BurstFlg(SubBullet);
-	BurstFlg(SPBullet);
-}
-
 void C_Player::FireExpF()
 {
 	auto FireFlg = [](std::vector<Bullet*>& Bu) -> void {
@@ -314,14 +289,46 @@ void C_Player::FireExpF()
 				PLAYER.ExpPos = (*A)->GetPos();
 				// BulletTypeに応じてExplosionを追加
 				if ((*A)->BulletType == Fire)
-					PLAYER.BulletExp.push_back(new Explosion(120,2));
+					PLAYER.BulletExp.push_back(new Explosion(120,2,1));
 				else
 					PLAYER.BulletExp.push_back(new Explosion(40));
 
 				// 現在の要素を安全に削除し、イテレーターを更新
 				A = Bu.erase(A); // eraseは次の要素を指す有効なイテレーターを返します
 			}
-			else {
+			else if ((*A)->BurstF)
+			{
+				PLAYER.BurstPos = (*A)->GetPos();
+				// BuからAを削除
+				A = Bu.erase(A); // イテレータを次の要素に進める炸裂
+				for (int i = 0; i < PLAYER.BurstMax; i++)
+				{
+					PLAYER.BurstDeg += 360 / PLAYER.BurstMax;
+					PLAYER.BurstBullet.push_back(new Bullet(BurstP));
+				}
+				continue; // erase後はAをインクリメントしない
+			} 
+			else if ((*A)->GraCnt < 0)
+			{
+				(*A)->GraCnt = 0;
+				PLAYER.ExpPos = (*A)->GetPos();
+				A = PLAYER.SPBullet.erase(A);
+				PLAYER.BulletExp.push_back(new Explosion(120, 5, 1));
+				continue;
+			}
+			else if ((*A)->SDF) {
+				PLAYER.ExpPos = (*A)->GetPos();
+				// BulletTypeに応じてExplosionを追加
+				if ((*A)->BulletType == SDust)
+					PLAYER.BulletExp.push_back(new Explosion(120, 10));
+				else
+					PLAYER.BulletExp.push_back(new Explosion(40));
+
+				// 現在の要素を安全に削除し、イテレーターを更新
+				A = Bu.erase(A); // eraseは次の要素を指す有効なイテレーターを返します
+			}
+			else 
+			{
 				++A; // 次の要素へ進む
 			}
 		}
@@ -339,26 +346,6 @@ void C_Player::LaesrFCnt()
 		LaesrCnt = 0;
 		LaesrF = true;
 		SPBullet.clear();
-	}
-}
-
-void C_Player::GraviFCnt()
-{
-	if (SPBulletCnt == Gravity)
-	{
-		for (auto A = SPBullet.begin(); A != SPBullet.end();)
-		{
-			(*A)->GraCnt--;
-			if ((*A)->GraCnt < 0)
-			{
-				(*A)->GraCnt = 0;
-				ExpPos = (*A)->GetPos();
-				A = SPBullet.erase(A);
-				BulletExp.push_back(new Explosion(120, 5,1));
-				continue;
-			}
-			++A;
-		}
 	}
 }
 
@@ -534,11 +521,6 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 		return 4;
 	}
 	else if (A == Sun)
-	{
-		Bu.push_back(new Bullet(A));
-		return 10;
-	}
-	else if (A == Return)
 	{
 		Bu.push_back(new Bullet(A));
 		return 10;

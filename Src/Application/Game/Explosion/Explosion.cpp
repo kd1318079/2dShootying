@@ -17,7 +17,7 @@ Explosion::Explosion(const int A, const float size,const int ExpType)
 void Explosion::Draw()
 {
 	D3D.SetBlendState(BlendMode::Add);
-	rect = ExpRect();
+	rect = ExpRect(10);
 	SHADER.m_spriteShader.SetMatrix(Mat);
 	SHADER.m_spriteShader.DrawTex(ETex, rect);
 	D3D.SetBlendState(BlendMode::Alpha);
@@ -30,10 +30,10 @@ void Explosion::Update()
 	MatSet();
 }
 
-Math::Rectangle Explosion::ExpRect()
+Math::Rectangle Explosion::ExpRect(int B)
 {
 	Math::Rectangle A;
-	int AA = ExpDelCnt / 10;
+	int AA = ExpDelCnt / B;
 	int AAA = ExpDelCnt - DeleteCnt;
 	A = { AAA / AA * 32 ,0 ,32, 32 };
 
