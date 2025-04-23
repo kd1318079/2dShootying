@@ -171,6 +171,7 @@
     <ClInclude Include="Src\Application\Game\Player\PlayerBlockTex.h" />
     <ClInclude Include="Src\Application\Game\UI\BaseUI.h" />
     <ClInclude Include="Src\Application\Game\UI\UI.h" />
+    <ClInclude Include="Src\Application\Game\UI\UITex.h" />
     <ClInclude Include="Src\Application\Load.h" />
     <ClInclude Include="Src\Application\Scene.h" />
     <ClInclude Include="Src\Application\main.h" />

@@ -13,12 +13,14 @@ Enemy::Enemy(int A)
 	Pos = {(float)(rand() % 1280 - 640),(float)(rand() % 720 - 360)};
 	Move = { 0,0 };
 	PScale = { 1,1 };
+	Main = Pos - PLAYER.GetScroll();
+	MatSet();
 }
 
 void Enemy::Update()
 {
 	if (APP.count % 2 == 0)CELLGET(Pos, &EHitJ);
-	if (!Hit)
+	if (!Hit && !Exp)
 	{
 		if (APP.count % 2 == 0)ATHit(PLAYER.MainBullet);
 		if (APP.count % 2 == 0)ATHit(PLAYER.SubBullet);
@@ -73,15 +75,41 @@ void Enemy::Update()
 	{
 		if (ExpCnt <= 0)
 		{
-			ExpCnt = 30;
+			ExpCnt = 60;
 			PLAYER.ExpPos = Pos;
-			PLAYER.BulletExp.push_back(new Explosion(ExpCnt, 2));
+			PLAYER.BulletExp.push_back(new Explosion(ExpCnt, 2,1));
 		}
 		ExpCnt--;
 		if (ExpCnt <= 0)
 		{
 			ExpCnt = 0;
 			Death = true;
+		}
+	}
+
+	//Move変更あり
+	if(!Exp)if (APP.count % 3 == 0) for (auto A : PLAYER.BulletExp)
+	{
+		if (SCENE.HitJudge(Pos, A->GetPos(), A->GetRectSize() * A->GetSize() / 1.5))
+		{
+			//ダメージ
+			if (A->EType == 2)
+			{
+				HP-= 2;
+			}
+			//グラビティ
+			if (A->EType == 4)
+			{
+				float Deg = ToDegrees(atan2(A->GetPos().y - Pos.y, A->GetPos().x - Pos.x)) - 90;
+				Move = { 5,5 };
+				Math::Vector2 Vec;
+				Vec.x = cos(ToRadians(Deg + 90));
+				Vec.y = sin(ToRadians(Deg + 90));
+				Move *= Vec;
+				
+			}
+			//HPが0以下になった時
+			DeathUpdate(this);
 		}
 	}
 
@@ -170,15 +198,12 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
 				PLAYER.ExpPos = (*A)->GetPos();
 				// BuからAを削除
 
-				if((*A)->BulletType == Fire) PLAYER.BulletExp.push_back(new Explosion(120,2));
-				else if ((*A)->BulletType == Gravity) PLAYER.BulletExp.push_back(new Explosion(120,5));
+				if((*A)->BulletType == Fire) PLAYER.BulletExp.push_back(new Explosion(72, 5, 2));
+				else if ((*A)->BulletType == Gravity) PLAYER.BulletExp.push_back(new Explosion(128, 5, 4));
 				else if((*A)->BulletType == SDust)PLAYER.BulletExp.push_back(new Explosion(60,10));
-				else PLAYER.BulletExp.push_back(new Explosion(40));
-				if (HP <= 0)
-				{
-					HP = 0;
-					Exp = true;
-				}
+				else PLAYER.BulletExp.push_back(new Explosion(18, 1, 3));
+
+				DeathUpdate(this);
 				if ((*A)->BulletType == Penetration || (*A)->BulletType == RailGun);
 				else 
 				{

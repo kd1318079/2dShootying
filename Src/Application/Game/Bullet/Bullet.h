@@ -16,6 +16,7 @@ public:
 
 	bool BurstF = false;
 	bool FireF = false;
+	bool GraF = false;
 	bool SDF = false;
 
 	int GraCnt = 0;

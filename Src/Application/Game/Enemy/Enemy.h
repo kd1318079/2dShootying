@@ -42,7 +42,9 @@ public:
 	bool Poizon = false;
 	int PoizonCnt = 0;
 
-	int HP = 200;
+	int HP = 20;
+
+	bool GravityF = false;
 private:
 	int ATK;
 	int DEF;

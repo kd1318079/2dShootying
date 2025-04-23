@@ -8,6 +8,7 @@ void C_Player::Init()
 {
 	PlayerTex = BlTEX.GetTex(5);
 	AimeTex.Load("Texture/Lockon.png");
+	BackTex.Load("Texture/BackG.png");
 }
 
 void C_Player::Update()
@@ -45,13 +46,23 @@ void C_Player::Draw()
 	Math::Matrix A = Math::Matrix::CreateTranslation(0,0,0);
 
 
-	for (auto Exp : BulletExp) Exp->Draw();
+	for (auto Exp : BulletExp) if(Exp->EType != 4)Exp->Draw();
 
+}
+
+void C_Player::PreDraw()
+{
+	rect = { 0,0,1024,1024 };
+	SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(6) * Math::Matrix::CreateTranslation(0 - Scroll.x, 0 - Scroll.y, 0));
+	SHADER.m_spriteShader.DrawTex(&BackTex, rect);
+	//グラビティ
+	for (auto Exp : BulletExp) if (Exp->EType == 4)Exp->Draw();
 }
 
 void C_Player::Release()
 {
 	AimeTex.Release();
+	BackTex.Release();
 }
 
 void C_Player::MouseGet()
@@ -177,7 +188,6 @@ void C_Player::PlayerDegSet()
 {
 	float Deg = ToDegrees(atan2(Pos.y - mousePos.y, Pos.x - mousePos.x)) + 90;
 	PlayerDeg = Deg;
-
 }
 
 void C_Player::PlayerAttack()
@@ -203,6 +213,7 @@ void C_Player::PlayerAttack()
 	//特殊
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
 	{
+
 		if(SPBulletCnt == Laesr) LaesrCnt = LeasrMax;
 
 		if (SPBulletCnt == Charge)
@@ -289,9 +300,9 @@ void C_Player::FireExpF()
 				PLAYER.ExpPos = (*A)->GetPos();
 				// BulletTypeに応じてExplosionを追加
 				if ((*A)->BulletType == Fire)
-					PLAYER.BulletExp.push_back(new Explosion(120,2,1));
+					PLAYER.BulletExp.push_back(new Explosion(72,5,2));
 				else
-					PLAYER.BulletExp.push_back(new Explosion(40));
+					PLAYER.BulletExp.push_back(new Explosion(40,1,3));
 
 				// 現在の要素を安全に削除し、イテレーターを更新
 				A = Bu.erase(A); // eraseは次の要素を指す有効なイテレーターを返します
@@ -308,12 +319,12 @@ void C_Player::FireExpF()
 				}
 				continue; // erase後はAをインクリメントしない
 			} 
-			else if ((*A)->GraCnt < 0)
+			else if ((*A)->GraF)
 			{
 				(*A)->GraCnt = 0;
 				PLAYER.ExpPos = (*A)->GetPos();
 				A = PLAYER.SPBullet.erase(A);
-				PLAYER.BulletExp.push_back(new Explosion(120, 5, 1));
+				PLAYER.BulletExp.push_back(new Explosion(128, 5, 4));
 				continue;
 			}
 			else if ((*A)->SDF) {
@@ -322,7 +333,7 @@ void C_Player::FireExpF()
 				if ((*A)->BulletType == SDust)
 					PLAYER.BulletExp.push_back(new Explosion(120, 10));
 				else
-					PLAYER.BulletExp.push_back(new Explosion(40));
+					PLAYER.BulletExp.push_back(new Explosion(18, 1, 3));
 
 				// 現在の要素を安全に削除し、イテレーターを更新
 				A = Bu.erase(A); // eraseは次の要素を指す有効なイテレーターを返します

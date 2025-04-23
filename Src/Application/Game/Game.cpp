@@ -48,6 +48,7 @@ void MainGame::Update()
 
 void MainGame::Draw()
 {
+	PLAYER.PreDraw();
 	for (auto A : MobEnemy) A->Draw();
 	for (auto A : BossEnemy) A->Draw();
 	PLAYER.Draw();

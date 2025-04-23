@@ -219,6 +219,15 @@ void Bullet::Update()
 			SDF = true;
 		}
 	}
+	if (BulletType == Gravity && GraCnt >= 0)
+	{
+		GraCnt--;
+		if (GraCnt <= 0)
+		{
+			GraCnt = 0;
+			GraF = true;
+		}
+	}
 
 	Pos += Move;	
 	Main = Pos - PLAYER.GetScroll();

@@ -13,6 +13,7 @@ public:
 	void Init();
 	void Update();
 	void Draw();
+	void PreDraw();
 	void Release();
 
 	std::vector<Bullet*> MainBullet;
@@ -26,7 +27,7 @@ public:
 	Math::Vector2 ExpPos = { 0,0 };
 	//’e‚ÌŽí—Þ
 	int BulletCnt = 30;			//Ž©“®
-	int SubBulletCnt = Fire;		//Žè“®
+	int SubBulletCnt = Fire;	//Žè“®
 	int SPBulletCnt = Gravity;	//“ÁŽê
 
 	int MissileCnt = 0;
@@ -74,6 +75,7 @@ private:
 
 	KdTexture* PlayerTex;
 	KdTexture AimeTex;
+	KdTexture BackTex;
 	POINT mousePos;
 
 	void MouseGet();

@@ -4,20 +4,33 @@
 
 Explosion::Explosion(const int A, const float size,const int ExpType)
 {
-	ETex = ExpTEX.GetTex(0);
+	ETex = ExpTEX.GetTex(ExpType);
 	Pos = PLAYER.ExpPos;
 	DeleteCnt = A;
 	ExpDelCnt = A;
 	PScale = { size,size };
+	Size = size;
 	EType = ExpType;
+	Main = Pos - PLAYER.GetScroll();
+	MatSet();
 }
-
-
 
 void Explosion::Draw()
 {
 	D3D.SetBlendState(BlendMode::Add);
-	rect = ExpRect(10);
+	if(EType == 0)rect = ExpRect(10);
+	if(EType == 1)rect = ExpRect(60);
+	if (EType == 2)
+	{
+		D3D.SetBlendState(BlendMode::Alpha);
+		rect = ExpRect(8);
+	}
+	if (EType == 3)rect = ExpRect(6);
+	if (EType == 4)
+	{
+		D3D.SetBlendState(BlendMode::Alpha);
+		rect = ExpRect(16);
+	}
 	SHADER.m_spriteShader.SetMatrix(Mat);
 	SHADER.m_spriteShader.DrawTex(ETex, rect);
 	D3D.SetBlendState(BlendMode::Alpha);
@@ -35,7 +48,14 @@ Math::Rectangle Explosion::ExpRect(int B)
 	Math::Rectangle A;
 	int AA = ExpDelCnt / B;
 	int AAA = ExpDelCnt - DeleteCnt;
-	A = { AAA / AA * 32 ,0 ,32, 32 };
+	if (AAA == AA * B)AAA -= 1;
+
+	if (EType == 0 || EType == 2) RectSize = 32;
+	if (EType == 1) RectSize = 100;
+	if (EType == 3) RectSize = 32;
+	if (EType == 4) RectSize = 64;
+
+	A = { AAA / AA * RectSize ,0 ,RectSize, RectSize };
 
 	return A;
 }

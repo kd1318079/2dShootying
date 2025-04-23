@@ -9,11 +9,15 @@ public:
 	void Draw();
 	void Update();
 	
+	//消滅カウント
 	int DeleteCnt = 0;
 	bool GravityHole = false;
 	int EType = 0;
+	int RectSize = 0;
+	int Size = 0;
 private:
 	int ExpCnt = 0;
+	//消滅までのフレーム(固定)
 	int ExpDelCnt = 0;
 	Math::Rectangle ExpRect(int B);
 
@@ -30,4 +34,8 @@ private:
 	Math::Matrix Mat;
 
 	void MatSet();
+public:
+	Math::Vector2 GetPos() { return Pos; };
+	int  GetRectSize() { return RectSize; };
+	int  GetSize() { return Size; };
 };
