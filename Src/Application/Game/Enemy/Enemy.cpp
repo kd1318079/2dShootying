@@ -13,7 +13,6 @@ Enemy::Enemy(int A)
 	Pos = {(float)(rand() % 1280 - 640),(float)(rand() % 720 - 360)};
 	Move = { 0,0 };
 	PScale = { 1,1 };
-	Main = Pos - PLAYER.GetScroll();
 	MatSet();
 }
 
@@ -34,9 +33,13 @@ void Enemy::Update()
 				{
 					if (isColliding(A->GetPos(), {1280,64},PLAYER.GetPDeg(), Pos, 24))
 					{
-						HP -= A->GetATK();
+						Dmg = A->GetATK() - DEF;
+						HP -= Dmg;
 						Hit = true;
+						
+						Dmgnum.push_back(new NumDraw({ Pos.x ,Pos.y }, Dmg));
 						DeathUpdate(this);
+
 					}
 
 				}
@@ -63,6 +66,8 @@ void Enemy::Update()
 				A->HP -= Dmg;
 				DeathUpdate(A);
 				A->Hit = true;
+				Dmgnum.push_back(new NumDraw({ Pos.x ,Pos.y }, Dmg));
+
 			}
 			ChainEnemy.clear();
 			ChainF = false;
@@ -112,9 +117,22 @@ void Enemy::Update()
 			DeathUpdate(this);
 		}
 	}
+	for (auto A = Dmgnum.begin(); A != Dmgnum.end(); )
+	{
+		(*A)->Cnt--;
+		if ((*A)->Cnt < 0)
+		{
+			A = Dmgnum.erase(A); // eraseは次の要素を指す有効なイテレーターを返します
+		}
+		else ++A;
+	}
+
+	if (Dmgnum.size() >= 10)
+	{
+		Dmgnum.erase(Dmgnum.begin()); // eraseは次の要素を指す有効なイテレーターを返します
+	}
 
 	Condisyon();
-	Main = Pos - PLAYER.GetScroll();
 
 	MatSet();
 }
@@ -127,11 +145,8 @@ void Enemy::Draw()
 	{
 		if (!Hit)SHADER.m_spriteShader.DrawTex(ETex, rect);
 	}
-	//SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateTranslation(0,0,0));
-	//Math::Color C = { 1,1,1,1 };
-	//for (auto A : ChainPosA) SHADER.m_spriteShader.DrawBox(A.x, A.y, 64 * 3, 64 * 3, &C,false);
-	//C = { 0,0,0,1 };
-	//for (auto A : ChainPosB) SHADER.m_spriteShader.DrawBox(A.x, A.y, 64 * 3, 64 * 3, &C,false);
+
+	for (auto A : Dmgnum)A->Draw();
 	Hit = false;
 }
 
@@ -141,7 +156,7 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
     {
         if (SCENE.CellHit(EHitJ, (*A)->GetCell()))
         {
-			if (SCENE.HitJudge(Pos, (*A)->GetPos(), 64))
+			if (SCENE.HitJudge(Pos, (*A)->GetPos(), Size))
 			{
 				//ダメージ計算
 				float Dmg = (*A)->GetATK() - DEF;
@@ -174,7 +189,7 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
 				//最低値保証
 				if (Dmg <= 0)Dmg = 1;
 				HP -= Dmg;
-
+				Dmgnum.push_back(new NumDraw({Pos.x ,Pos.y}, Dmg));
 
 				//エネルギー回復
 				if ((*A)->SunF)
@@ -342,7 +357,7 @@ bool Enemy::ChainHit(Math::Vector2 ChP)
 
 void Enemy::MatSet()
 {
-	Trans = Math::Matrix::CreateTranslation(Main.x, Main.y, 0);
+	Trans = Math::Matrix::CreateTranslation(Pos.x, Pos.y, 0);
 	Rota = Math::Matrix::CreateRotationZ(ToRadians(Deg));
 	Scale = Math::Matrix::CreateScale(PScale.x, PScale.y, 0);
 

@@ -11,7 +11,6 @@ Explosion::Explosion(const int A, const float size,const int ExpType)
 	PScale = { size,size };
 	Size = size;
 	EType = ExpType;
-	Main = Pos - PLAYER.GetScroll();
 	MatSet();
 }
 
@@ -39,7 +38,6 @@ void Explosion::Draw()
 void Explosion::Update()
 {
 	DeleteCnt--;
-	Main = Pos - PLAYER.GetScroll();
 	MatSet();
 }
 
@@ -62,7 +60,7 @@ Math::Rectangle Explosion::ExpRect(int B)
 
 void Explosion::MatSet()
 {
-	Trans = Math::Matrix::CreateTranslation(Main.x, Main.y, 0);
+	Trans = Math::Matrix::CreateTranslation(Pos.x, Pos.y, 0);
 	Scale = Math::Matrix::CreateScale(PScale.x, PScale.y, 0);
 
 	Mat = Scale * Trans;

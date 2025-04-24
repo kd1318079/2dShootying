@@ -167,6 +167,8 @@
     <ClInclude Include="Src\Application\Game\Explosion\Explosion.h" />
     <ClInclude Include="Src\Application\Game\Explosion\ExpTexLoad.h" />
     <ClInclude Include="Src\Application\Game\Game.h" />
+    <ClInclude Include="Src\Application\Game\Num.h" />
+    <ClInclude Include="Src\Application\Game\NumDraw.h" />
     <ClInclude Include="Src\Application\Game\Player\Player.h" />
     <ClInclude Include="Src\Application\Game\Player\PlayerBlockTex.h" />
     <ClInclude Include="Src\Application\Game\UI\BaseUI.h" />

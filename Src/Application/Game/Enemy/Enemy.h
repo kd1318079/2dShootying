@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Define.h"
 #include "../Bullet/Bullet.h"
+#include "../NumDraw.h"
 
 class Bullet;
 
@@ -23,6 +24,8 @@ public:
 	//始点・終点
 	std::vector<Math::Vector2> ChainPosA;
 	std::vector<Math::Vector2> ChainPosB;
+
+	std::vector<NumDraw*> Dmgnum;
 	Enemy* CEnemy;
 	std::vector<Enemy*> ChainEnemy;
 	//チェインしているかのフラグ
@@ -42,13 +45,14 @@ public:
 	bool Poizon = false;
 	int PoizonCnt = 0;
 
-	int HP = 20;
+	int HP = 2000;
 
 	bool GravityF = false;
 private:
 	int ATK;
 	int DEF;
-	
+	int Size = 64;
+
 	int Dmg = 0;
 
 	bool Hit = false;
@@ -65,7 +69,6 @@ private:
 
 	void MatSet();
 
-	Math::Vector2 Main;
 	Math::Vector2 Pos;
 	Math::Vector2 Move;
 	Math::Vector2 PScale;

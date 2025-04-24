@@ -16,6 +16,10 @@ public:
 	void PreDraw();
 	void Release();
 
+	static const int PartsMax = 15;
+	char PlayerParts[PartsMax][PartsMax];
+
+
 	std::vector<Bullet*> MainBullet;
 	std::vector<Bullet*> SubBullet;
 	std::vector<Bullet*> SPBullet;
@@ -27,8 +31,8 @@ public:
 	Math::Vector2 ExpPos = { 0,0 };
 	//弾の種類
 	int BulletCnt = 30;			//自動
-	int SubBulletCnt = Fire;	//手動
-	int SPBulletCnt = Gravity;	//特殊
+	int SubBulletCnt = Straight;	//手動
+	int SPBulletCnt = Laesr;	//特殊
 
 	int MissileCnt = 0;
 	Math::Vector2 SetMove(Math::Vector2 A) { Move = A; };
@@ -70,11 +74,13 @@ private:
 	int HP = 10;
 	int DEF = 5;
 	int Energy = 100;
+	
 
 	int EnergyMax = 100;
 
 	KdTexture* PlayerTex;
 	KdTexture AimeTex;
+	KdTexture* DegTex;
 	KdTexture BackTex;
 	POINT mousePos;
 
@@ -86,7 +92,7 @@ private:
 	void ExplosionUpdate();
 	void SetMat();
 
-	float PlayerSpd = 0; 
+	float PlayerSpd = 1; 
 
 	//自動攻撃のフラグ
 	bool AutoAttack = false;
@@ -108,31 +114,28 @@ private:
 	bool LaesrF = false;
 	const int LeasrMax = 60;
 
-	Math::Vector2 Scroll = {0,0};
-	float scrolMAX = 2000;                     //右の限界
-	float scrolMIN = -2000;                     //左の限界
-	float scrolUP = 2000;                      //上の上限
-	float scrolDOWN = -2000;                    //下の上限
-	void ScrollMax();
-
 	//Matrix
 	Math::Matrix Scale;
 	Math::Matrix Rota;
 	Math::Matrix Trans;
+
 	//player
 	Math::Matrix Mat;
-	//Aime
 	Math::Matrix AimMat;
+	Math::Matrix DegMat;
 
 	//プレイヤー座標
-	Math::Vector2 Main = {0,0};
 	Math::Vector2 Pos = {0,0};
 	Math::Vector2 Move = {0,0};
-	Math::Vector2 PScale = { 1,1 };
+	Math::Vector2 PScale = { 0.05,0.05 };
+	Math::Vector2 DegScale = { 0.15,0.65 };
+	Math::Vector2 AimeScale = { 1,1 };
 
 	float PlayerDeg = 0;
 	float AimeDeg = 0;
-	
+
+	float DegSpeed = 0.5;
+
 	bool SHIFT = false;
 	bool SHIFT1 = false;
 	int Count = 0;
@@ -157,9 +160,7 @@ public:
 	float GetPDeg() 	{return PlayerDeg; };
 	Math::Vector2 GetPos() { return Pos; }
 	Math::Matrix GetMatrix() { return Mat; }
-	Math::Vector2 GetMain() { return Main; }
 	Math::Vector2 GetMove() { return Move; }
-	Math::Vector2 GetScroll() { return Scroll; }
 	Math::Vector2 GetMousePos() 
 	{
 		Math::Vector2 A = { (float)mousePos.x,(float)mousePos.y};

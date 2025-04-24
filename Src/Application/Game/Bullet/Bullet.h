@@ -88,7 +88,6 @@ private:
 
 	void MatSet();
 
-	Math::Vector2 Main = { 0,0 };
 	Math::Vector2 Pos = { 0,0 };
 	Math::Vector2 PScale = { 1,1 };
 

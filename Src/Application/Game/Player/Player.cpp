@@ -6,7 +6,8 @@
 
 void C_Player::Init()
 {
-	PlayerTex = BlTEX.GetTex(5);
+	PlayerTex = BlTEX.GetTex(0);
+	DegTex = BlTEX.GetTex(1);
 	AimeTex.Load("Texture/Lockon.png");
 	BackTex.Load("Texture/BackG.png");
 }
@@ -31,20 +32,26 @@ void C_Player::Update()
 
 void C_Player::Draw()
 {
+	//弾描画
 	for (auto Main : MainBullet) Main->Draw();
 	for (auto Sub : SubBullet) Sub->Draw();
 	for (auto SP : SPBullet) SP->Draw();
 	for (auto BU : BurstBullet) BU->Draw();
 
-	rect = { 0,0,32,32 };
+	D3D.SetBlendState(BlendMode::Add);
+	rect = { 0,0,640, 640 };
+	SHADER.m_spriteShader.SetMatrix(DegMat);
+	SHADER.m_spriteShader.DrawTex(DegTex, rect, 1, { 0.5,0.2 });
+	
+	D3D.SetBlendState(BlendMode::Alpha);
+	rect = { 0,0,640, 640};
 	SHADER.m_spriteShader.SetMatrix(Mat);
-	SHADER.m_spriteShader.DrawTex(PlayerTex, rect);
-
-	rect = { 0,0,64,64 };
+	SHADER.m_spriteShader.DrawTex(PlayerTex, rect, 1, {0.5,0.25});
+	
+	rect = { 0,0,64, 64 };
 	SHADER.m_spriteShader.SetMatrix(AimMat);
 	SHADER.m_spriteShader.DrawTex(&AimeTex, rect);
 	Math::Matrix A = Math::Matrix::CreateTranslation(0,0,0);
-
 
 	for (auto Exp : BulletExp) if(Exp->EType != 4)Exp->Draw();
 
@@ -52,8 +59,8 @@ void C_Player::Draw()
 
 void C_Player::PreDraw()
 {
-	rect = { 0,0,1024,1024 };
-	SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(6) * Math::Matrix::CreateTranslation(0 - Scroll.x, 0 - Scroll.y, 0));
+	rect = { 0,0,1280,720 };
+	SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(1) * Math::Matrix::CreateTranslation(0 , 0 , 0));
 	SHADER.m_spriteShader.DrawTex(&BackTex, rect);
 	//グラビティ
 	for (auto Exp : BulletExp) if (Exp->EType == 4)Exp->Draw();
@@ -70,8 +77,8 @@ void C_Player::MouseGet()
 	//マウス座標取得
 	GetCursorPos(&mousePos);
 	ScreenToClient(APP.m_window.GetWndHandle(), &mousePos);
-	mousePos.x -= 640 - Scroll.x;
-	mousePos.y -= 360 + Scroll.y;
+	mousePos.x -= 640;
+	mousePos.y -= 360;
 	//mousePos.x *= -1;
 	mousePos.y *= -1;
 }
@@ -82,7 +89,6 @@ void C_Player::MovePlayer()
 	AimeDeg += 3;
 	if (AimeDeg >= 360)AimeDeg = 0;
 	//機体サイズでスピードを落とす
-	PlayerSpd = 3.0;
 	float Su = 6;
 
 	if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
@@ -178,16 +184,32 @@ void C_Player::MovePlayer()
 	else if (!SHIFT)Move *= 0.985;
 	else Move *= 0.925;
 
-	Scroll = Pos;
-	ScrollMax();
-	Main = Pos - Scroll;
-
 }
 
-void C_Player::PlayerDegSet()
-{
+void C_Player::PlayerDegSet() {
 	float Deg = ToDegrees(atan2(Pos.y - mousePos.y, Pos.x - mousePos.x)) + 90;
-	PlayerDeg = Deg;
+
+	// 差分の計算
+	float diff = Deg - PlayerDeg;
+
+	// 角度範囲補正 (-180～180)
+	if (diff > 180) diff -= 360;
+	if (diff < -180) diff += 360;
+
+	// 徐々に角度を変化させる
+	if (abs(diff) < DegSpeed / 2)
+	{
+		PlayerDeg = Deg;
+	}
+	else
+	{
+		if (diff < 0)PlayerDeg -= DegSpeed;
+		else PlayerDeg += DegSpeed;
+	}
+	// 範囲補正 (0～360度)
+	if (PlayerDeg >= 360) PlayerDeg -= 360;
+	if (PlayerDeg < 0) PlayerDeg += 360;
+
 }
 
 void C_Player::PlayerAttack()
@@ -280,16 +302,20 @@ void C_Player::ExplosionUpdate()
 
 void C_Player::SetMat()
 {
-	Trans = Math::Matrix::CreateTranslation(mousePos.x -Scroll.x, mousePos.y - Scroll.y, 0);
-	Rota = Math::Matrix::CreateRotationZ(ToRadians(AimeDeg));
-	Scale = Math::Matrix::CreateScale(PScale.x, PScale.y, 0);
-	AimMat = Scale * Rota * Trans;
-
-	Trans = Math::Matrix::CreateTranslation(Main.x, Main.y, 0);
+	Trans = Math::Matrix::CreateTranslation(Pos.x, Pos.y, 0);
 	Rota = Math::Matrix::CreateRotationZ(ToRadians(PlayerDeg));
 	Scale = Math::Matrix::CreateScale(PScale.x, PScale.y, 0);
-
 	Mat = Scale * Rota * Trans;
+
+	Trans = Math::Matrix::CreateTranslation(Pos.x, Pos.y, 0);
+	Rota = Math::Matrix::CreateRotationZ(ToRadians(PlayerDeg));
+	Scale = Math::Matrix::CreateScale(DegScale.x, DegScale.y, 0);
+	DegMat = Scale * Rota * Trans;
+
+	Trans = Math::Matrix::CreateTranslation(mousePos.x, mousePos.y, 0);
+	Rota = Math::Matrix::CreateRotationZ(ToRadians(AimeDeg));
+	Scale = Math::Matrix::CreateScale(AimeScale.x, AimeScale.y, 0);
+	AimMat = Scale * Rota * Trans;
 }
 
 void C_Player::FireExpF()
@@ -357,22 +383,6 @@ void C_Player::LaesrFCnt()
 		LaesrCnt = 0;
 		LaesrF = true;
 		SPBullet.clear();
-	}
-}
-
-void C_Player::ScrollMax()
-{
-	if (Scroll.y > scrolUP) {
-		Scroll.y = scrolUP;
-	}
-	if (Scroll.y < scrolDOWN) {
-		Scroll.y = scrolDOWN;
-	}
-	if (Scroll.x < scrolMIN) {
-		Scroll.x = scrolMIN;
-	}
-	if (Scroll.x > scrolMAX) {
-		Scroll.x = scrolMAX;
 	}
 }
 
@@ -527,9 +537,7 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 	else if (A == Commet)
 	{
 		Bu.push_back(new Bullet(A));
-		Bu.push_back(new Bullet(A));
-		Bu.push_back(new Bullet(A));
-		return 4;
+		return 5;
 	}
 	else if (A == Sun)
 	{

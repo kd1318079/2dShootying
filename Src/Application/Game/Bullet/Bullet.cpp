@@ -124,7 +124,7 @@ void Bullet::Update()
 		MissileCnt++;
 		if (MissileCnt == 20)
 		{
-			MemDeg = ToDegrees(atan2(Pos.y - PLAYER.GetMousePos().y, Pos.x - PLAYER.GetMousePos().x)) + 90;
+			MemDeg = PLAYER.GetPDeg();
 			MoveDeg = (MemDeg - Deg) / 20.0;
 			Move = { 0,0 };
 		}
@@ -230,17 +230,15 @@ void Bullet::Update()
 	}
 
 	Pos += Move;	
-	Main = Pos - PLAYER.GetScroll();
+
 	//ÉåÅ[ÉUÅ[ÇæÇØì¡éÍ
 	if (BulletType == Laesr)
 	{
 		Pos = PLAYER.GetPos();
-		Main = PLAYER.GetMain();
 		Math::Vector2 M;
 		M.x = cos(ToRadians(PLAYER.GetPDeg() + 90));
 		M.y = sin(ToRadians(PLAYER.GetPDeg() + 90));
 		Pos += M * 640;
-		Main += M * 640;
 		Deg = PLAYER.GetPDeg();
 	}
 	MatSet();
@@ -248,6 +246,7 @@ void Bullet::Update()
 
 void Bullet::ATStraight(Math::Vector2 A)
 {
+	Attack = 200;
 	float Spd;
 	Spd = 8;
 	Move = { Spd,Spd };
@@ -382,7 +381,7 @@ void Bullet::ATFire(Math::Vector2 A)
 
 void Bullet::ATLaesr(Math::Vector2 A)
 {
-	Attack = 10;
+	Attack = 120;
 	Pos = PLAYER.GetPos();
 	Deg = PLAYER.GetPDeg();
 	BTex = BuTEX.GetLaserTex();
@@ -415,6 +414,8 @@ void Bullet::ATHoming(Math::Vector2 A)
 
 void Bullet::ATRailGun(Math::Vector2 A)
 {
+	Attack = 50;
+
 	float Spd;
 	Spd = 30;
 	Move = { Spd,Spd };
@@ -468,7 +469,7 @@ void Bullet::ATMoon(Math::Vector2 A)
 
 void Bullet::ATCommet(Math::Vector2 A)
 {
-	Attack = 2;
+	Attack = 15;
 	float Spd;
 	Spd = 10;
 	Spd += (rand() % 10 - 5) / 100; 
@@ -565,7 +566,7 @@ void Bullet::DecreCh()
 
 void Bullet::MatSet()
 {
-	Trans = Math::Matrix::CreateTranslation(Main.x, Main.y, 0);
+	Trans = Math::Matrix::CreateTranslation(Pos.x, Pos.y, 0);
 
 	Rota = Math::Matrix::CreateRotationZ(ToRadians(Deg));
 	if(BulletType == Auto) 

@@ -22,7 +22,6 @@ private:
 	Math::Rectangle ExpRect(int B);
 
 	Math::Vector2 Pos;
-	Math::Vector2 Main;
 	Math::Vector2 PScale = {1,1};
 
 	KdTexture* ETex;
