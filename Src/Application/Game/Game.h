@@ -2,6 +2,7 @@
 #include"../Scene.h"
 #include"Player/Player.h"
 #include"Enemy/Enemy.h"
+#include"../Define.h"
 
 class MainGame
 {
@@ -13,14 +14,38 @@ public:
 	void Draw();
 	void Release();
 
-	std::vector<Enemy*> MobEnemy;
-	std::vector<Enemy*> BossEnemy;
+	std::vector<Enemy*> AllEnemy;
 
 	MainGame() {};
 	~MainGame() {};
 
+	void SceneChangeDraw(int i);
+	bool SceneCT = false;
+	bool SceneCC = true;
+	int SceneCnt = 0;
+	int SceneMaxCnt = 0;
+
+	//シーン変更時のタイプ
+	int SceneChangeCnt = 0;
+
+
+	void SetSceneChangeCnt();
+	const int SceneMax = 1;
 private:
 	
+	int NowScene = Title;
+	bool KeyFlg = false;
+
+	void SceneUp();
+
+
+	//シーン遷移の描画
+	void SC_Draw0();
+
+
+	//
+	Math::Vector2 BackPos[18][32];
+
 
 public:
 	static MainGame& GetInstance()

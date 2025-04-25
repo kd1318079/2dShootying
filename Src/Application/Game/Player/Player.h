@@ -10,6 +10,8 @@ public:
 	C_Player() {};
 	~C_Player() {};
 
+	//ƒQ[ƒ€ŠJn‚É•Ï”‚ğ‰Šú‰»‚·‚éŠÖ”
+	void ReturnInit();
 	void Init();
 	void Update();
 	void Draw();
@@ -30,9 +32,9 @@ public:
 
 	Math::Vector2 ExpPos = { 0,0 };
 	//’e‚Ìí—Ş
-	int BulletCnt = 30;			//©“®
-	int SubBulletCnt = Straight;	//è“®
-	int SPBulletCnt = Laesr;	//“Áê
+	int BulletCnt = Missile;			//©“®
+	int SubBulletCnt = Fire;	//è“®
+	int SPBulletCnt = Gravity;	//“Áê
 
 	int MissileCnt = 0;
 	Math::Vector2 SetMove(Math::Vector2 A) { Move = A; };
@@ -70,6 +72,9 @@ public:
 	int LaesrCnt = 0;
 
 	int ContiCnt = 0;
+
+	bool Alive = false;
+
 private:
 	int HP = 10;
 	int DEF = 5;

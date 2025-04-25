@@ -39,4 +39,19 @@ typedef enum
 	 SLight
 }BulletTypeNum;
 
+typedef enum 
+{
+	Title = 0,
+	Game,
+	Result,
+};
+
+enum class EnemyState
+{
+	Move,
+	Attack,
+	Return,
+	Dead,
+};
+
 #define Cell Cell

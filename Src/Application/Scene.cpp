@@ -38,7 +38,7 @@ void Scene::ImGuiUpdate()
 		ImGui::Text("PlayerSpd : %f", PLAYER.GetSpd());
 		ImGui::Text("PlayerSpd : %f", PLAYER.GetPDeg());
 		ImGui::Text("ContiCnt : %d", PLAYER.ContiCnt);
-		if(GM.MobEnemy.size() == 1)ImGui::Text("Enmey HP : %d", GM.MobEnemy[0]->HP);
+		if(GM.AllEnemy.size() == 1)ImGui::Text("Enmey HP : %d", GM.AllEnemy[0]->HP);
 	}
 	ImGui::End();
 }

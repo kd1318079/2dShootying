@@ -19,7 +19,7 @@ private:
 
 inline Num::Num()
 {
-	NumTex.Load("Texture/Num.png");
+	NumTex.Load("Texture/others/Num.png");
 }
 
 inline Num::~Num()

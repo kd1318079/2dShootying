@@ -5,12 +5,12 @@ class NumDraw
 {
 public:
 	NumDraw(Math::Vector2 A ,int B);
-	~NumDraw();
+	~NumDraw() {};
 
 	Math::Vector2 Pos;
 	int Dmg = 0;
 	int Cnt = 0;
-	void Draw();
+	void Draw(int ESize);
 	
 private:
 	KdTexture* NumTex;
@@ -25,7 +25,7 @@ inline NumDraw::NumDraw(Math::Vector2 A,int B)
 	NumTex = NUMTEX.GetTex();
 }
 
-inline void NumDraw::Draw()
+inline void NumDraw::Draw(int ESize)
 {
 	int digCnt = 0;
 	int num = Dmg;
@@ -42,7 +42,7 @@ inline void NumDraw::Draw()
 	float Move = 0;
 
 	if (Cnt > 25)  Move = sin(ToRadians(Count));
-	Pos.y += Move * 2.3;
+	Pos.y += Move * 2.3 / 64 * ESize;
 
 	for (int j = 0; j < digCnt; j++)
 	{

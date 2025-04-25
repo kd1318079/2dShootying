@@ -4,12 +4,17 @@
 #include "../Game.h"
 #include <memory>
 
+void C_Player::ReturnInit()
+{
+	Alive = true;
+}
+
 void C_Player::Init()
 {
 	PlayerTex = BlTEX.GetTex(0);
 	DegTex = BlTEX.GetTex(1);
-	AimeTex.Load("Texture/Lockon.png");
-	BackTex.Load("Texture/BackG.png");
+	AimeTex.Load("Texture/others/Lockon.png");
+	BackTex.Load("Texture/others/BackG.png");
 }
 
 void C_Player::Update()
@@ -574,7 +579,7 @@ void C_Player::Attack2(std::vector<Bullet*>& Bu, int A, int* B, bool* F)
 	if (*B <= -10)
 	{
 		*F = false;
-		*B = 200;
+		*B = 30;
 	}
 }
 
@@ -596,7 +601,7 @@ void C_Player::AutoAT()
 			float dy = PLAYER.GetPos().y - A.y;
 			float c = sqrt(dx * dx + dy * dy);
 
-			if (c < *Dis && Cnt < GM.MobEnemy.size()) // 最小値を更新する条件
+			if (c < *Dis && Cnt < GM.AllEnemy.size()) // 最小値を更新する条件
 			{
 				*Dis = c;
 				PLAYER.DisCnt = Cnt;
@@ -611,7 +616,7 @@ void C_Player::AutoAT()
 	DisCnt = 0;
 
 	ECnt = 0;
-	for (auto A : GM.MobEnemy)
+	for (auto A : GM.AllEnemy)
 	{
 		if (!A) continue;
 		if (Compere(A->GetPos(), Up, Down, &AutoDis, ECnt))
@@ -624,8 +629,8 @@ void C_Player::AutoAT()
 
 	if (ATT)
 	{
-		if (DisCnt >= 0 && DisCnt < GM.MobEnemy.size()) {
-			auto it = GM.MobEnemy.begin() + DisCnt;
+		if (DisCnt >= 0 && DisCnt < GM.AllEnemy.size()) {
+			auto it = GM.AllEnemy.begin() + DisCnt;
 			PLAYER.AutoDeg = ToDegrees(atan2(PLAYER.GetPos().y - (*it)->GetPos().y, PLAYER.GetPos().x - (*it)->GetPos().x));
 
 

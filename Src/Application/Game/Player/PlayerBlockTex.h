@@ -20,15 +20,9 @@ private:
 
 inline BlockLoad::BlockLoad()
 {
-	BlTex[0].Load("Texture/Player.png");
-	BlTex[1].Load("Texture/Aime.png");
-	//for (int i = 0; i < BMax; i++)
-	//{
-	//	char str[100];
-	//	sprintf_s(str, sizeof(str), "Texture/Parts/BasicBlock%d.png", i);
-	//	BlTex[i].Load(str);//scene.h‚É‚à‘‚¢‚½’Ê‚èƒLƒƒƒ‰–¼‚Æ“Y‚¦Žš‚ÅƒLƒƒƒ‰•Ê‚ÌTexture‚ð‚Â‚­‚é
-	//}
-	//BlTex[BMax - 1].Load("Texture/Parts/WaponBase.png");
+	BlTex[0].Load("Texture/others/Player.png");
+	BlTex[1].Load("Texture/others/Aime.png");
+	BlTex[2].Load("Texture/others/Block.png");
 }
 
 inline BlockLoad::~BlockLoad()

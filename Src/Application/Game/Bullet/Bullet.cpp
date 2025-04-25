@@ -139,10 +139,11 @@ void Bullet::Update()
 		if (MissileCnt == 40)
 		{
 			Math::Vector2 M;
-
+			float A = atan2(Pos.y - PLAYER.GetMousePos().y, Pos.x - PLAYER.GetMousePos().x) + ToRadians(180);
+			Deg = ToDegrees(A) - 90;
 			Move = { MissileSpd,MissileSpd };
-			M.x = cos(ToRadians(Deg + 90));
-			M.y = sin(ToRadians(Deg + 90));
+			M.x = cos(A);
+			M.y = sin(A);
 			Move *= M;
 		}
 		if (MissileCnt >= 41)
@@ -154,7 +155,7 @@ void Bullet::Update()
 	if (BulletType == Burst || BulletType == Fire || BulletType == SDust ||BulletType == Gravity)DecreCh();
 	if (BulletType == Homing && !HomingF)
 	{
-		for (auto A : GM.MobEnemy)
+		for (auto A : GM.AllEnemy)
 		{
 			if (SCENE.CellHit(A->EHitJ, GetCell()))
 			{
@@ -270,10 +271,11 @@ void Bullet::ATFast(Math::Vector2 A)
 
 void Bullet::ATMissile(Math::Vector2 A)
 {
-	Attack = 3;
+	Attack = 100;
 	if (PLAYER.MissileCnt < 5)MissileLeft = true;
 	PLAYER.MissileCnt++;
 	if (PLAYER.MissileCnt >= 9)PLAYER.MissileCnt = 0;
+
 	if (MissileLeft)
 	{
 		A.x = cos(ToRadians(PLAYER.GetPDeg() + 180));

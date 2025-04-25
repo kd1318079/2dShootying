@@ -11,6 +11,11 @@ public:
 	Enemy(int A);
 	~Enemy() {};
 
+	//行動パターン
+	EnemyState EState = EnemyState::Return;
+	//行動変化タイマー
+	int Timer = 600;
+
 	void Update();
 	void Draw();
 	void ATHit(std::vector<Bullet*>& Bu);
@@ -49,9 +54,13 @@ public:
 
 	bool GravityF = false;
 private:
+	int TypeNum = 0;
+	bool Boss = false;
+
 	int ATK;
 	int DEF;
 	int Size = 64;
+
 
 	int Dmg = 0;
 
@@ -76,11 +85,38 @@ private:
 	long double Deg = 0;
 	
 	int ContiCnt = 0;
+
+	Math::Vector2 PosSet();
 	//状態異常Update
 	void Condisyon();
 
 	//死亡時　基本はExpをtrueにするボスだけ例外処理
 	void DeathUpdate(Enemy* A);
+
+	void E_Update(int i);
+
+	bool MoveUpdate(int i);
+	bool AttackUpdate(int i);
+	bool ReturnUpdate(int i);
+
+	void ChangeState(EnemyState E, const int SetTimer = 2400);
+
+	void Update0();
+	void Update1();
+	void Update2();
+	void Update3();
+	void Update4();
+	void Update5();
+
+	void Atk0();
+	void Atk1();
+	void Atk2();
+	void Atk3();
+	void Atk4();
+	void Atk5();
+
+	Math::Vector2 Move0();
+	Math::Vector2 Move1();
 public:
 	Math::Vector2 GetPos() { return Pos; }
 };

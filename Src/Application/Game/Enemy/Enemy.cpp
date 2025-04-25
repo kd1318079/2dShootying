@@ -7,12 +7,14 @@
 Enemy::Enemy(int A)
 {
 	//Aは敵の種類を指定
+	TypeNum = A;
 	ATK = 1;
 	DEF = 1;
 	ETex = ENEMYTEX.GetTex(0);
-	Pos = {(float)(rand() % 1280 - 640),(float)(rand() % 720 - 360)};
+	Pos = PosSet();
 	Move = { 0,0 };
-	PScale = { 1,1 };
+	PScale = { 0.8,0.8 };
+	EState = EnemyState::Move;
 	MatSet();
 }
 
@@ -92,27 +94,31 @@ void Enemy::Update()
 		}
 	}
 
+	E_Update(TypeNum);
 	//Move変更あり
-	if(!Exp)if (APP.count % 3 == 0) for (auto A : PLAYER.BulletExp)
+	if(!Exp)if (APP.count % 4 == 0) for (auto A : PLAYER.BulletExp)
 	{
 		if (SCENE.HitJudge(Pos, A->GetPos(), A->GetRectSize() * A->GetSize() / 1.5))
 		{
 			//ダメージ
 			if (A->EType == 2)
 			{
-				HP-= 2;
+				HP-= 3;
+				Dmgnum.push_back(new NumDraw({ Pos.x ,Pos.y }, 3));
 			}
 			//グラビティ
 			if (A->EType == 4)
 			{
 				float Deg = ToDegrees(atan2(A->GetPos().y - Pos.y, A->GetPos().x - Pos.x)) - 90;
-				Move = { 5,5 };
+				//Move = { 5,5 };
 				Math::Vector2 Vec;
 				Vec.x = cos(ToRadians(Deg + 90));
 				Vec.y = sin(ToRadians(Deg + 90));
-				Move *= Vec;
-				
+				Move += Vec * 6;
+				//Move *= -1;
+				GravityF = true;
 			}
+			
 			//HPが0以下になった時
 			DeathUpdate(this);
 		}
@@ -139,6 +145,7 @@ void Enemy::Update()
 
 void Enemy::Draw()
 {
+
 	rect = { 0,0,64,64 };
 	SHADER.m_spriteShader.SetMatrix(Mat);
 	if (!Exp)
@@ -146,7 +153,7 @@ void Enemy::Draw()
 		if (!Hit)SHADER.m_spriteShader.DrawTex(ETex, rect);
 	}
 
-	for (auto A : Dmgnum)A->Draw();
+	for (auto A : Dmgnum)A->Draw(Size * PScale.x);
 	Hit = false;
 }
 
@@ -156,7 +163,7 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
     {
         if (SCENE.CellHit(EHitJ, (*A)->GetCell()))
         {
-			if (SCENE.HitJudge(Pos, (*A)->GetPos(), Size))
+			if (SCENE.HitJudge(Pos, (*A)->GetPos(), Size * PScale.x))
 			{
 				//ダメージ計算
 				float Dmg = (*A)->GetATK() - DEF;
@@ -322,7 +329,7 @@ bool Enemy::ChainHit(Math::Vector2 ChP)
 	DisCnt = 0;
 
 	int ECnt = 0;
-	for (auto A : GM.MobEnemy)
+	for (auto A : GM.AllEnemy)
 	{
 		if (!A) continue;
 		//if (A == this)continue;
@@ -332,9 +339,9 @@ bool Enemy::ChainHit(Math::Vector2 ChP)
 		}
 		ECnt++;
 	}
-	/*auto Aa = GM.MobEnemy.begin() + DisCnt;
+	/*auto Aa = GM.AllEnemy.begin() + DisCnt;
 	CEnemy = *Aa;*/
-	auto Aa = GM.MobEnemy.begin() + DisCnt;
+	auto Aa = GM.AllEnemy.begin() + DisCnt;
 	CEnemy = *Aa;
 
 	if (ATT)
@@ -364,6 +371,29 @@ void Enemy::MatSet()
 	Mat = Rota * Scale * Trans;
 }
 
+Math::Vector2 Enemy::PosSet()
+{
+	Math::Vector2 A;
+	float X = cos(rand() % 360);
+	float Y = sin(rand() % 360);
+
+	if (rand() % 2)
+	{
+		/*if(rand() % 2) A = { 640 + Size / 2.0f,Y * 360};
+		else A = { -640 - Size / 2.0f,Y * 360};*/
+		
+		if(rand() % 2) A = { 640,Y * 360};
+		else A = { -640,Y * 360};
+	}
+	else
+	{
+		if (rand() % 2) A = { X * 640,360  };
+		else A = { X * 640,-360};
+	}
+	A = {(float)cos(rand() % 360) * 400,(float)cos(rand() % 360) * 200};
+	return A;
+}
+
 void Enemy::Condisyon()
 {
 	if (Virus)
@@ -389,3 +419,204 @@ void Enemy::DeathUpdate(Enemy* A)
 		A->Exp = true;
 	}
 }
+
+void Enemy::E_Update(int i)
+{
+	switch (EState)
+	{
+	case EnemyState::Move:	 if(MoveUpdate(TypeNum))		ChangeState(EnemyState::Attack);	break;		//初期値からの移動
+	case EnemyState::Attack:
+	{
+		//ボスの時は移動か攻撃を続ける
+		if (Boss)
+		{
+			if (AttackUpdate(TypeNum))	ChangeState(EnemyState::Move, 600);
+			break;
+		}
+		//ボス以外の時は画面外に
+		if (AttackUpdate(TypeNum))	ChangeState(EnemyState::Return, 600);
+		break;
+	}
+	case EnemyState::Return: if(ReturnUpdate(TypeNum))	ChangeState(EnemyState::Dead);			break;		//攻撃した後画面外に
+	case EnemyState::Dead:	 if(Timer <= 0)Death = true;										break;		//画面外で消す処理
+	}
+}
+
+bool Enemy::MoveUpdate(int i)
+{
+	switch(i)
+	{
+	case 0:
+		Update0();
+		break;
+	case 1:
+		Update1();
+		break;
+	case 2:
+		Update2();
+		break;
+	case 3:
+		Update3();
+		break;
+	case 4:
+		Update4();
+		break;
+	case 5:
+		Update5();
+		break;
+	}
+
+	if (Timer < 0) return true;
+	else return false;
+}
+
+bool Enemy::AttackUpdate(int i)
+{
+	switch (i)
+	{
+	case 0:
+		Atk0();
+		break;
+	case 1:
+		Atk1();
+		break;
+	case 2:
+		Atk2();
+		break;
+	case 3:
+		Atk3();
+		break;
+	case 4:
+		Atk4();
+		break;
+	case 5:
+		Atk5();
+		break;
+	}
+	if (Timer < 0) return true;
+	else return false;
+}
+
+bool Enemy::ReturnUpdate(int i)
+{
+	float Deg = atan2(Pos.y, Pos.x);
+	Math::Vector2 A;
+	A.x = cos(Deg);
+	A.y = sin(Deg);
+	Move = { 0.8,0.8 };
+	Move *= A;
+
+	if (Timer < 0) return true;
+	else return false;
+}
+
+void Enemy::ChangeState(EnemyState E,const int SetTimer)
+{
+	EState = E;
+	Timer = SetTimer;
+}
+
+void Enemy::Update0()
+{
+	Move = Move0();
+}
+
+void Enemy::Update1()
+{
+
+}
+
+void Enemy::Update2()
+{
+
+}
+
+void Enemy::Update3()
+{
+
+}
+
+void Enemy::Update4()
+{
+
+}
+
+void Enemy::Update5()
+{
+
+}
+
+void Enemy::Atk0()
+{
+	Move = Move0();
+}
+
+void Enemy::Atk1()
+{
+
+}
+
+void Enemy::Atk2()
+{
+
+}
+
+void Enemy::Atk3()
+{
+
+}
+
+void Enemy::Atk4()
+{
+
+}
+
+void Enemy::Atk5()
+{
+
+}
+
+Math::Vector2 Enemy::Move0()
+{
+	float Deg = ToDegrees(atan2(Pos.y, Pos.x));				//自分の角度
+	float Rad = sqrt(Pos.x * Pos.x + Pos.y * Pos.y);	//半径
+	float DegSp = rand() % 5 / 10 + 0.2;								//回転角度
+	//移動先を少し内側に
+	float RadS = 1;
+	Rad -= RadS;
+
+	float RadMax = 450;
+	if (!GravityF)
+	{
+		if (Rad < RadMax)Rad = RadMax;
+	}
+	else
+	{
+		if (Rad >= RadMax)
+		{
+			Rad = RadMax;
+		}
+		else Rad += RadS * 1.4;
+	}
+	//移動先のPosを取得する
+	//角度を足す
+	Deg += DegSp;
+	if (Deg >= 360)Deg -= 360;
+
+	//移動先のPosへのベクトルの作成
+	Math::Vector2 A;
+	A.x = cos(ToRadians(Deg));
+	A.y = sin(ToRadians(Deg));
+
+	//半径とベクトルを合成して移動先のPosの取得
+	Math::Vector2 Pos2 = A * Rad;
+
+	// 既存の座標に円運動を加える
+	return Pos2 - Pos;
+}
+
+Math::Vector2 Enemy::Move1()
+{
+	return Math::Vector2();
+}
+

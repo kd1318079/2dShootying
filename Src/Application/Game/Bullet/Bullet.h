@@ -97,7 +97,7 @@ private:
 	
 	bool MissileLeft = false;
 	int MissileCnt = 0;
-	const float MissileSpd = 1.5;
+	const float MissileSpd = 5;
 	Math::Vector2 MoveRad;
 
 public:
