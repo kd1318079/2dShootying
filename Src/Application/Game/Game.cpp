@@ -17,12 +17,10 @@ void MainGame::Init()
 
 void MainGame::Update()
 {
-
+	Count++;
 	if(NowScene == Title)
 	{
-		//”wŒi•`‰æ
-		PLAYER.PreDraw();
-
+	
 
 	}
 	else if (NowScene == Game)
@@ -40,14 +38,22 @@ void MainGame::Update()
 				++it;
 			}
 		}
-		if (AllEnemy.empty())
+		if (!Enemy5PosCnt.empty())
 		{
-			if (AllEnemy.size() == 0)
+			for (auto A : Enemy5PosCnt)
 			{
-				for (int i = 0; i < 100; i++)
-					AllEnemy.push_back(new Enemy(0));
+				for (auto B : Enemy5Cnt)
+				{
+					for (int i = 0; i < B; i++)
+					{
+						AllEnemy.push_back(new Enemy(5,A));
+					}
+				}
 			}
+			Enemy5Cnt.clear();
+			Enemy5PosCnt.clear();
 		}
+		if(Count % EnemyInter == 0) AllEnemy.push_back(new Enemy(6));
 	}
 	else if (NowScene == Result)
 	{
@@ -62,6 +68,8 @@ void MainGame::Draw()
 {
 	if (NowScene == Title)
 	{
+		//”wŒi•`‰æ
+		PLAYER.PreDraw();
 
 	}
 	else if (NowScene == Game)
@@ -90,9 +98,10 @@ void MainGame::SceneUp()
 {
 	if (GetAsyncKeyState(VK_LBUTTON))
 	{
-		if (!KeyFlg)
+		if (!KeyFlg && !SceneCh)
 		{
 			KeyFlg = true;
+			SceneCh = true;
 			switch (NowScene)
 			{
 			case Title:
@@ -188,12 +197,11 @@ void MainGame::SceneChangeDraw(int i)
 			SC_Draw0();
 			break;
 		}
-
-
 		if (SceneCnt == 0)
 		{
 			SceneCT = true;
 			SceneCC = false;
+			SceneCh = false;
 		}
 	}
 }

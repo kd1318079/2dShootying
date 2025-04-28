@@ -15,6 +15,22 @@ Enemy::Enemy(int A)
 	Move = { 0,0 };
 	PScale = { 0.8,0.8 };
 	EState = EnemyState::Move;
+	SetStetas(A);
+	MatSet();
+}
+
+Enemy::Enemy(int A, Math::Vector2 B)
+{
+	//Aは敵の種類を指定
+	TypeNum = A;
+	ATK = 1;
+	DEF = 1;
+	ETex = ENEMYTEX.GetTex(0);
+	Pos = B;
+	Move = { 0,0 };
+	PScale = { 0.8,0.8 };
+	EState = EnemyState::Move;
+	SetStetas(A);
 	MatSet();
 }
 
@@ -95,6 +111,8 @@ void Enemy::Update()
 	}
 
 	E_Update(TypeNum);
+	
+
 	//Move変更あり
 	if(!Exp)if (APP.count % 4 == 0) for (auto A : PLAYER.BulletExp)
 	{
@@ -141,6 +159,7 @@ void Enemy::Update()
 	Condisyon();
 
 	MatSet();
+
 }
 
 void Enemy::Draw()
@@ -155,6 +174,8 @@ void Enemy::Draw()
 
 	for (auto A : Dmgnum)A->Draw(Size * PScale.x);
 	Hit = false;
+
+	
 }
 
 void Enemy::ATHit(std::vector<Bullet*>& Bu)
@@ -365,7 +386,7 @@ bool Enemy::ChainHit(Math::Vector2 ChP)
 void Enemy::MatSet()
 {
 	Trans = Math::Matrix::CreateTranslation(Pos.x, Pos.y, 0);
-	Rota = Math::Matrix::CreateRotationZ(ToRadians(Deg));
+	Rota = Math::Matrix::CreateRotationZ(ToRadians(Deg - 90));
 	Scale = Math::Matrix::CreateScale(PScale.x, PScale.y, 0);
 
 	Mat = Rota * Scale * Trans;
@@ -374,23 +395,12 @@ void Enemy::MatSet()
 Math::Vector2 Enemy::PosSet()
 {
 	Math::Vector2 A;
-	float X = cos(rand() % 360);
 	float Y = sin(rand() % 360);
 
-	if (rand() % 2)
-	{
-		/*if(rand() % 2) A = { 640 + Size / 2.0f,Y * 360};
-		else A = { -640 - Size / 2.0f,Y * 360};*/
-		
-		if(rand() % 2) A = { 640,Y * 360};
-		else A = { -640,Y * 360};
-	}
-	else
-	{
-		if (rand() % 2) A = { X * 640,360  };
-		else A = { X * 640,-360};
-	}
-	A = {(float)cos(rand() % 360) * 400,(float)cos(rand() % 360) * 200};
+	if (rand() % 2) A = { 640 + Size / 2.0f,Y * 300 };
+	else A = { -640 - Size / 2.0f,Y * 300 };
+
+	//A = {(float)cos(rand() % 360) * 400,(float)cos(rand() % 360) * 200};
 	return A;
 }
 
@@ -422,23 +432,31 @@ void Enemy::DeathUpdate(Enemy* A)
 
 void Enemy::E_Update(int i)
 {
-	switch (EState)
+	Timer--;
+	if (!Exp)
 	{
-	case EnemyState::Move:	 if(MoveUpdate(TypeNum))		ChangeState(EnemyState::Attack);	break;		//初期値からの移動
-	case EnemyState::Attack:
-	{
-		//ボスの時は移動か攻撃を続ける
-		if (Boss)
+		switch (EState)
 		{
-			if (AttackUpdate(TypeNum))	ChangeState(EnemyState::Move, 600);
+		case EnemyState::Move:	 if (MoveUpdate(TypeNum))		ChangeState(EnemyState::Attack);	break;		//初期値からの移動
+		case EnemyState::Attack:
+		{
+			//ボスの時は移動か攻撃を続ける
+			if (Boss)
+			{
+				if (AttackUpdate(TypeNum)) 
+				{
+					ChangeState(EnemyState::Move, 600);
+					BossF = false;
+				}
+				break;
+			}
+			//ボス以外の時は画面外に
+			if (AttackUpdate(TypeNum))	ChangeState(EnemyState::Return, 600);
 			break;
 		}
-		//ボス以外の時は画面外に
-		if (AttackUpdate(TypeNum))	ChangeState(EnemyState::Return, 600);
-		break;
-	}
-	case EnemyState::Return: if(ReturnUpdate(TypeNum))	ChangeState(EnemyState::Dead);			break;		//攻撃した後画面外に
-	case EnemyState::Dead:	 if(Timer <= 0)Death = true;										break;		//画面外で消す処理
+		case EnemyState::Return: if (ReturnUpdate(TypeNum))	ChangeState(EnemyState::Dead);			break;		//攻撃した後画面外に
+		case EnemyState::Dead:	 if (Timer <= 0)Death = true;										break;		//画面外で消す処理
+		}
 	}
 }
 
@@ -453,17 +471,27 @@ bool Enemy::MoveUpdate(int i)
 		Update1();
 		break;
 	case 2:
-		Update2();
+		Update1();
 		break;
 	case 3:
-		Update3();
+		Update2();
 		break;
 	case 4:
-		Update4();
-		break;
-	case 5:
 		Update5();
 		break;
+	case 5:
+		Update4();
+		break;
+	case 6:
+		Update6();
+		break;
+	case 7:
+		Update7();
+		break;
+	case 8:
+		Update8();
+		break;
+
 	}
 
 	if (Timer < 0) return true;
@@ -478,19 +506,28 @@ bool Enemy::AttackUpdate(int i)
 		Atk0();
 		break;
 	case 1:
-		Atk1();
+		Atk0();
 		break;
 	case 2:
-		Atk2();
+		Atk1();
 		break;
 	case 3:
-		Atk3();
+		Atk2();
 		break;
 	case 4:
-		Atk4();
+		Atk3();
 		break;
 	case 5:
-		Atk5();
+		Atk4();
+		break;
+	case 6:
+		Atk6();
+		break;
+	case 7:
+		Atk7();
+		break;
+	case 8:
+		Atk8();
 		break;
 	}
 	if (Timer < 0) return true;
@@ -523,47 +560,120 @@ void Enemy::Update0()
 
 void Enemy::Update1()
 {
-
+	Move = Move1(true);
 }
 
 void Enemy::Update2()
 {
-
+	Move = Move2(1.5);
 }
 
 void Enemy::Update3()
 {
-
+	Move = Move3();
 }
 
 void Enemy::Update4()
 {
-
+	if (Timer > 1975)
+	{
+		if (!ERe)
+		{
+			ERe = true;
+			DegC = rand() % 360;
+		}
+		Deg = DegC;
+		Move = { 1,1 };
+		Math::Vector2 Vec = { cos(ToRadians(DegC)) , sin(ToRadians(DegC)) };
+		Move *= Vec;
+	}
+	else
+	{
+		if (Timer % 180 == 0)
+		{
+			float PDeg = ToDegrees(atan2(PLAYER.GetPos().y - Pos.y, PLAYER.GetPos().x - Pos.x));
+			Deg = ToRadians(PDeg);
+			PLAYER.EBullet.push_back(new EnemyBullet(Pos, 0, 2, 3));
+			Move = { 0,0 };
+		}
+		Timer+=2;
+		if (Timer >= 750)Timer = 300;
+	}
 }
 
 void Enemy::Update5()
 {
+	Move = Move3();
+}
 
+void Enemy::Update6()
+{
+	Move = Move6();
+}
+
+void Enemy::Update7()
+{
+}
+
+void Enemy::Update8()
+{
 }
 
 void Enemy::Atk0()
 {
-	Move = Move0();
+	//Move = Move0();
+	Move = { 0,0 };
+	if (Timer % 100 == 0)
+	{
+		PLAYER.EBullet.push_back(new EnemyBullet(Pos, 0, 2, 3));
+	}
 }
 
 void Enemy::Atk1()
 {
+	if (BulletF1)
+	{
+		float Spd;
+		if (Timer > 760) Spd = -0.8;
+		else
+		{
+			BulletF1 = false;
+			Spd = 12;
+			Timer = 250;
+		}
+		Deg = atan2(PLAYER.GetPos().y - Pos.y,PLAYER.GetPos().x - Pos.x);
+		Math::Vector2 Vec = { (float)cos(Deg),(float)sin(Deg) };
+		Move = { Spd ,Spd };
+		Move *= Vec;
+	}
+	else
+	{
+		Move *= 0.988;
+	}
 
 }
 
 void Enemy::Atk2()
 {
-
+	//何もしない
 }
 
 void Enemy::Atk3()
 {
+	if (Timer % 1500 == 0)
+	{
+		float PDeg = ToDegrees(atan2(PLAYER.GetPos().y - Pos.y, PLAYER.GetPos().x - Pos.x));
+		Deg = ToRadians(PDeg);
 
+		PLAYER.EBullet.push_back(new EnemyBullet(Pos, 0, 2, 3));
+		int A = rand() % 3 + 1;
+
+		GM.Enemy5Cnt.push_back(A);
+		GM.Enemy5PosCnt.push_back(Pos);
+
+	}
+
+	Timer += 2;
 }
 
 void Enemy::Atk4()
@@ -576,16 +686,43 @@ void Enemy::Atk5()
 
 }
 
+void Enemy::Atk6()
+{
+	Deg = ToDegrees(atan2(PLAYER.GetPos().y - Pos.y,PLAYER.GetPos().x - Pos.x));
+	
+	if (Timer % 1000 == 500)
+	{
+		PLAYER.EBullet.push_back(new EnemyBullet(Pos, 0, 2, 3, Deg));
+		for (int i = 0; i < 15; i++)
+		{
+			float DegS = 0.7;
+			float A = i * DegS;
+
+			PLAYER.EBullet.push_back(new EnemyBullet(Pos, 0, 2, 3, Deg - A));
+			PLAYER.EBullet.push_back(new EnemyBullet(Pos, 0, 2, 3, Deg + A));
+		}
+	}
+	Deg = ToRadians(Deg);
+}
+
+void Enemy::Atk7()
+{
+}
+
+void Enemy::Atk8()
+{
+}
+
 Math::Vector2 Enemy::Move0()
 {
 	float Deg = ToDegrees(atan2(Pos.y, Pos.x));				//自分の角度
 	float Rad = sqrt(Pos.x * Pos.x + Pos.y * Pos.y);	//半径
 	float DegSp = rand() % 5 / 10 + 0.2;								//回転角度
 	//移動先を少し内側に
-	float RadS = 1;
+	float RadS = 0.2;
 	Rad -= RadS;
 
-	float RadMax = 450;
+	float RadMax = 200;
 	if (!GravityF)
 	{
 		if (Rad < RadMax)Rad = RadMax;
@@ -601,7 +738,7 @@ Math::Vector2 Enemy::Move0()
 	//移動先のPosを取得する
 	//角度を足す
 	Deg += DegSp;
-	if (Deg >= 360)Deg -= 360;
+	if (Deg >= 360)Deg-= 360;
 
 	//移動先のPosへのベクトルの作成
 	Math::Vector2 A;
@@ -615,8 +752,168 @@ Math::Vector2 Enemy::Move0()
 	return Pos2 - Pos;
 }
 
-Math::Vector2 Enemy::Move1()
+Math::Vector2 Enemy::Move1(const bool A)
+{
+	if (!BulletF1)
+	{
+		BulletF1 = true;
+		if (Pos.x > 0)		MovePlas.x = -4;
+		else if (Pos.x < 0)	MovePlas.x = 4;
+	}
+	if (Pos.y > 300)		MovePlas.y = -5;
+	else if (Pos.y < -300)	MovePlas.y = 5;
+	
+	float B = 0.9 + rand() % 10 / 100 / 2;
+	if (Pos.x <= 580 && Pos.x >= -580) MovePlas *= B;
+	if (fabs(MovePlas.x) <= 0.05)
+	{
+		if (Timer > 400)
+		{
+			if (!A)Timer = 120;
+			else Timer = 20;
+		}
+		MovePlas = { 0,0 };
+	}
+	return MovePlas;
+}
+
+Math::Vector2 Enemy::Move2(const float Spd)
+{
+	float PDeg = ToDegrees(atan2(PLAYER.GetPos().y - Pos.y, PLAYER.GetPos().x - Pos.x));
+
+	// 差分の計算
+	float diff = PDeg - Deg;
+
+	// 角度範囲補正 (-180～180)
+	if (diff > 180) diff -= 360;
+	if (diff < -180) diff += 360;
+
+	// 徐々に角度を変化させる
+	if (abs(diff) < DegSpeed / 2)
+	{
+		Deg - PDeg;
+	}
+	else
+	{
+		if (diff < 0)Deg -= DegSpeed;
+		else Deg += DegSpeed;
+	}
+	// 範囲補正 (0～360度)
+	if (Deg >= 360) Deg -= 360;
+	if (Deg < 0) Deg += 360;
+
+	Math::Vector2 A;
+	A = { Spd,Spd };
+	A *= {cos(ToRadians(Deg)), sin(ToRadians(Deg))};
+
+	Timer += 2;
+	if (Timer > 3000)Timer = 0;
+	return A;
+}
+
+Math::Vector2 Enemy::Move3()
+{
+	if (!BulletF1)
+	{
+		BulletF1 = true;
+		if (Pos.x > 0)		MovePlas.x = -4;
+		else if (Pos.x < 0)	MovePlas.x = 4;
+	}
+	if (Pos.y > 300)		MovePlas.y = -5;
+	else if (Pos.y < -300)	MovePlas.y = 5;
+
+	float B = 0.9 + rand() % 10 / 100 / 2;
+	if (Pos.x <= 520 && Pos.x >= -520) MovePlas *= B;
+	if (fabs(MovePlas.x) <= 0.05)
+	{
+		if (Timer > 400)
+		{
+			Timer = 120;
+		}
+		MovePlas = { 0,0 };
+	}
+	return MovePlas;
+}
+
+Math::Vector2 Enemy::Move6()
+{
+	Math::Vector2 A;
+	Deg = atan2(-Pos.y, -Pos.x);
+	Math::Vector2 Vec = { (float)cos(Deg),(float)sin(Deg) };
+	A = Vec * 2;
+
+	Deg = ToDegrees(Deg);
+	if (!BossF) if (fabs(Pos.x) <= 1 && fabs(Pos.y) <= 1)
+	{
+		BossF = true;
+		Timer = 10;
+	}
+	if (BossF)A = { 0,0 };
+	return A;
+}
+
+Math::Vector2 Enemy::Move7()
 {
 	return Math::Vector2();
+}
+
+Math::Vector2 Enemy::Move8()
+{
+	return Math::Vector2();
+}
+
+void Enemy::SetStetas(int A)
+{
+	switch (A)
+	{
+	case 0:
+		HP = 50;
+		ATK = 2;
+		DEF = 3;
+		break;
+	case 1:
+		HP = 30;
+		ATK = 2;
+		DEF = 3;
+		break;
+	case 2:
+		HP = 10;
+		ATK = 2;
+		DEF = 3;
+		break;
+	case 3:
+		HP = 20;
+		ATK = 2;
+		DEF = 3;
+		break;
+	case 4:
+		HP = 100;
+		ATK = 2;
+		DEF = 3;
+		break;
+	case 5:
+		HP = 5;
+		ATK = 2;
+		DEF = 2;
+		break;
+	case 6:
+		HP = 2000;
+		ATK = 2;
+		DEF = 2;
+		Boss = true;
+		break;
+	case 7:
+		HP = 2000;
+		ATK = 2;
+		DEF = 2;
+		Boss = true;
+		break;
+	case 8:
+		HP = 2000;
+		ATK = 2;
+		DEF = 2;
+		Boss = true;
+		break;
+	}
 }
 

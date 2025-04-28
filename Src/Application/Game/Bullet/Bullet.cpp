@@ -2,6 +2,8 @@
 #include "BulletTexLoad.h"
 #include "../../Game/Game.h"
 #include "../../main.h"
+//#include "../Enemy/Enemy.h"
+
 Bullet::Bullet(int A)
 {
 	Pos = PLAYER.GetPos();
@@ -99,7 +101,7 @@ Bullet::Bullet(int A)
 
 void Bullet::Draw()
 {
-	rect = { 0,0,32,32 };
+	rect = { 0,0,64,64 };
 	if (TexNo == Laesr)
 	{
 		rect = { 0,0,64,1280 };
@@ -109,7 +111,7 @@ void Bullet::Draw()
 	}
 	else
 	{
-		D3D.SetBlendState(BlendMode::Alpha);
+		D3D.SetBlendState(BlendMode::Add);
 		SHADER.m_spriteShader.SetMatrix(Mat);
 		SHADER.m_spriteShader.DrawTex(BTex, rect);
 	}

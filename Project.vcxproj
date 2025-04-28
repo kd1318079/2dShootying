@@ -162,6 +162,7 @@
     <ClInclude Include="Src\Application\Define.h" />
     <ClInclude Include="Src\Application\Game\Bullet\Bullet.h" />
     <ClInclude Include="Src\Application\Game\Bullet\BulletTexLoad.h" />
+    <ClInclude Include="Src\Application\Game\Bullet\EnemyBullet.h" />
     <ClInclude Include="Src\Application\Game\Enemy\Enemy.h" />
     <ClInclude Include="Src\Application\Game\Enemy\EnemyTexLoad.h" />
     <ClInclude Include="Src\Application\Game\Explosion\Explosion.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="..\Library\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="..\Library\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Src\Application\Game\Bullet\Bullet.cpp" />
+    <ClCompile Include="Src\Application\Game\Bullet\EnemyBullet.cpp" />
     <ClCompile Include="Src\Application\Game\Enemy\Enemy.cpp" />
     <ClCompile Include="Src\Application\Game\Explosion\Explosion.cpp" />
     <ClCompile Include="Src\Application\Game\Game.cpp" />

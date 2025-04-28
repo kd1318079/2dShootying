@@ -204,6 +204,9 @@
     <ClInclude Include="Src\Application\Game\NumDraw.h">
       <Filter>Src\Application\Game</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Application\Game\Bullet\EnemyBullet.h">
+      <Filter>Src\Application\Game\Bullet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Pch.cpp">
@@ -289,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="Src\Application\Game\UI\BaseUI.cpp">
       <Filter>Src\Application\Game\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Game\Bullet\EnemyBullet.cpp">
+      <Filter>Src\Application\Game\Bullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

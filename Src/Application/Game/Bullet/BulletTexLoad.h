@@ -8,6 +8,8 @@ public:
 	
 	KdTexture* GetTex(int A) { return &BuTex[A]; };
 	KdTexture* GetLaserTex() { return &LaesrTex; };
+
+	KdTexture* GetETex(int A) { return &EBuTex[A]; };
 	static BulletLoad& GetInstance()
 	{
 		static BulletLoad instance;
@@ -17,6 +19,10 @@ private:
 	static const int BMax = 22 + 1;
 	KdTexture BuTex[BMax];
 	KdTexture LaesrTex;
+	
+	static const int EBMax = 22 + 1;
+	KdTexture EBuTex[EBMax];
+
 	
 };
 
@@ -29,6 +35,13 @@ inline BulletLoad::BulletLoad()
 		BuTex[i].Load(str);//scene.hにも書いた通りキャラ名と添え字でキャラ別のTextureをつくる
 	}
 	LaesrTex.Load("Texture/Bullet/laser.png");
+	
+	for (int i = 0; i < EBMax; i++)
+	{
+		char str[100];
+		sprintf_s(str, sizeof(str), "Texture/Bullet/EBullet1.png");
+		EBuTex[i].Load(str);//scene.hにも書いた通りキャラ名と添え字でキャラ別のTextureをつくる
+	}
 }
 
 inline BulletLoad::~BulletLoad()
@@ -38,6 +51,10 @@ inline BulletLoad::~BulletLoad()
 		BuTex[i].Release();
 	}
 	LaesrTex.Release();
+	for (int i = 0; i < EBMax; i++)
+	{
+		EBuTex[i].Release();
+	}
 }
 
 #define BuTEX BulletLoad::GetInstance()

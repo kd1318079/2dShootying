@@ -1,6 +1,7 @@
 #pragma once
 #include "../Bullet/Bullet.h"
 #include "../Explosion/Explosion.h"
+#include "../Bullet/EnemyBullet.h"
 #include <memory>
 #include "../../Define.h"
 
@@ -9,6 +10,7 @@ class C_Player
 public:
 	C_Player() {};
 	~C_Player() {};
+
 
 	//ƒQ[ƒ€ŠJn‚É•Ï”‚ğ‰Šú‰»‚·‚éŠÖ”
 	void ReturnInit();
@@ -21,11 +23,16 @@ public:
 	static const int PartsMax = 15;
 	char PlayerParts[PartsMax][PartsMax];
 
+	void EnemyB();
+
 
 	std::vector<Bullet*> MainBullet;
 	std::vector<Bullet*> SubBullet;
 	std::vector<Bullet*> SPBullet;
 	
+
+	std::vector<EnemyBullet*> EBullet;
+
 	std::vector<Bullet*> BurstBullet;
 
 	std::vector<Explosion*> BulletExp;
@@ -33,8 +40,8 @@ public:
 	Math::Vector2 ExpPos = { 0,0 };
 	//’e‚Ìí—Ş
 	int BulletCnt = Missile;			//©“®
-	int SubBulletCnt = Fire;	//è“®
-	int SPBulletCnt = Gravity;	//“Áê
+	int SubBulletCnt = Homing;	//è“®
+	int SPBulletCnt = Laesr;	//“Áê
 
 	int MissileCnt = 0;
 	Math::Vector2 SetMove(Math::Vector2 A) { Move = A; };
@@ -139,7 +146,7 @@ private:
 	float PlayerDeg = 0;
 	float AimeDeg = 0;
 
-	float DegSpeed = 0.5;
+	float DegSpeed = 10;
 
 	bool SHIFT = false;
 	bool SHIFT1 = false;

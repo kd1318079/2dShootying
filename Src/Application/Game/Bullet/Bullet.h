@@ -1,6 +1,5 @@
 #pragma once
 #include "../../Define.h"
-#include "../Enemy/Enemy.h"
 
 class Enemy;
 class Bullet

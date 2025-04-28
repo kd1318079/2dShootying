@@ -2,6 +2,7 @@
 #include "../../Define.h"
 #include "../Bullet/Bullet.h"
 #include "../NumDraw.h"
+#include "../Bullet/EnemyBullet.h"
 
 class Bullet;
 
@@ -9,12 +10,13 @@ class Enemy
 {
 public:
 	Enemy(int A);
+	Enemy(int A,Math::Vector2 B);
 	~Enemy() {};
 
 	//行動パターン
 	EnemyState EState = EnemyState::Return;
 	//行動変化タイマー
-	int Timer = 600;
+	int Timer = 2000;
 
 	void Update();
 	void Draw();
@@ -23,6 +25,12 @@ public:
 	double PointToLine(Math::Vector2 A, Math::Vector2 B, Math::Vector2 C);
 	bool isColliding(Math::Vector2 rectCenter,Math::Vector2 rectSize,float rectDeg,Math::Vector2 circlePos,float circleRadius);
 	bool ChainHit(Math::Vector2 ChP);
+
+
+	bool BulletF1 = false;
+	Math::Vector2 MovePlas;
+
+
 
 	bool ChainF = false;
 	int ChainCnt = 0;
@@ -50,9 +58,9 @@ public:
 	bool Poizon = false;
 	int PoizonCnt = 0;
 
-	int HP = 2000;
-
 	bool GravityF = false;
+
+	int HP = 2000;
 private:
 	int TypeNum = 0;
 	bool Boss = false;
@@ -99,7 +107,7 @@ private:
 	bool AttackUpdate(int i);
 	bool ReturnUpdate(int i);
 
-	void ChangeState(EnemyState E, const int SetTimer = 2400);
+	void ChangeState(EnemyState E, const int SetTimer = 800);
 
 	void Update0();
 	void Update1();
@@ -107,16 +115,38 @@ private:
 	void Update3();
 	void Update4();
 	void Update5();
+	//ボス
+	void Update6();
+	void Update7();
+	void Update8();
 
-	void Atk0();
-	void Atk1();
-	void Atk2();
-	void Atk3();
-	void Atk4();
+
+
+	void Atk0();		//止まって攻撃
+	void Atk1();		//引っ張って飛んでいく
+	void Atk2();		//なにもしない
+	void Atk3();		//5の敵を生み出す　※永続
+	void Atk4();		//
 	void Atk5();
+	void Atk6();
+	void Atk7();
+	void Atk8();
 
 	Math::Vector2 Move0();
-	Math::Vector2 Move1();
+	Math::Vector2 Move1(const bool A = false);
+	Math::Vector2 Move2(const float Spd = 1.2);
+	Math::Vector2 Move3();
+	Math::Vector2 Move6();
+	Math::Vector2 Move7();
+	Math::Vector2 Move8();
+
+	float DegSpeed = 10;
+
+	int DegC;
+	bool ERe = false;
+	bool BossF = false;
+
+	void SetStetas(int A);
 public:
 	Math::Vector2 GetPos() { return Pos; }
 };

@@ -19,6 +19,8 @@ void C_Player::Init()
 
 void C_Player::Update()
 {
+	EnemyB();
+
 	//マウス座標ゲット
 	MouseGet();
 	//自機の移動
@@ -33,11 +35,14 @@ void C_Player::Update()
 	ExplosionUpdate();
 	//自機とマウス座標の決定
 	SetMat();
+
 }
 
 void C_Player::Draw()
 {
 	//弾描画
+	for (auto A : EBullet) A->Draw();
+
 	for (auto Main : MainBullet) Main->Draw();
 	for (auto Sub : SubBullet) Sub->Draw();
 	for (auto SP : SPBullet) SP->Draw();
@@ -46,7 +51,7 @@ void C_Player::Draw()
 	D3D.SetBlendState(BlendMode::Add);
 	rect = { 0,0,640, 640 };
 	SHADER.m_spriteShader.SetMatrix(DegMat);
-	SHADER.m_spriteShader.DrawTex(DegTex, rect, 1, { 0.5,0.2 });
+	SHADER.m_spriteShader.DrawTex(DegTex, rect, 0.3, { 0.5,0.2 });
 	
 	D3D.SetBlendState(BlendMode::Alpha);
 	rect = { 0,0,640, 640};
@@ -59,7 +64,7 @@ void C_Player::Draw()
 	Math::Matrix A = Math::Matrix::CreateTranslation(0,0,0);
 
 	for (auto Exp : BulletExp) if(Exp->EType != 4)Exp->Draw();
-
+	
 }
 
 void C_Player::PreDraw()
@@ -75,6 +80,32 @@ void C_Player::Release()
 {
 	AimeTex.Release();
 	BackTex.Release();
+}
+
+void C_Player::EnemyB()
+{
+	for (auto A = EBullet.begin(); A != EBullet.end(); ) {
+		{
+			float MaxX = 700;
+			float MaxY = 400;
+			if ((*A)->Exp)
+			{
+				PLAYER.ExpPos = (*A)->GetPos();
+				A = EBullet.erase(A);
+				PLAYER.BulletExp.push_back(new Explosion(30, 2, 0));
+			}
+			else if ((*A)->GetPos().x > MaxX || (*A)->GetPos().x < -MaxX || (*A)->GetPos().y > MaxY || (*A)->GetPos().x < -MaxX)
+			{
+				A = EBullet.erase(A);
+			}
+			else
+			{
+				(*A)->Update();
+				++A; // 次の要素へ進む
+			}
+
+		}
+	}
 }
 
 void C_Player::MouseGet()
@@ -106,8 +137,10 @@ void C_Player::MovePlayer()
 		if (SHIFT1)
 		{
 			Count++;
+			
 			if (Count > 10)
 			{
+
 				//SHIFT = false;
 				Su = 3;
 			}
@@ -130,22 +163,27 @@ void C_Player::MovePlayer()
 		if (GetAsyncKeyState('A') & 0x8000)
 		{
 			Move.x -= PlayerSpd;
-			if (SHIFT)Move.x -= PlayerSpd * Su;
+			//if (SHIFT)Move.x -= PlayerSpd * Su;
 		}
 		if (GetAsyncKeyState('D') & 0x8000)
 		{
 			Move.x += PlayerSpd;
-			if (SHIFT)Move.x += PlayerSpd * Su;
+			//if (SHIFT)Move.x += PlayerSpd * Su;
 		}
 		if (GetAsyncKeyState('W') & 0x8000)
 		{
 			Move.y += PlayerSpd;
-			if (SHIFT)Move.y += PlayerSpd * Su;
+			//if (SHIFT)Move.y += PlayerSpd * Su;
 		}
 		if (GetAsyncKeyState('S') & 0x8000)
 		{
 			Move.y -= PlayerSpd;
-			if (SHIFT)Move.y -= PlayerSpd * Su;
+			//if (SHIFT)Move.y -= PlayerSpd * Su;
+		}
+		if (GetAsyncKeyState(VK_RBUTTON) & 0x8000)
+		{
+			Math::Vector2 A = { cos(ToRadians(PlayerDeg + 90)) , sin(ToRadians(PlayerDeg + 90)) };
+			Move += {(A.x / 10.0f * Su), (A.y / 10.0f * Su)};
 		}
 		if (SHIFT)
 		{
@@ -180,7 +218,6 @@ void C_Player::MovePlayer()
 			}
 		}
 	}
-	
 
 	
 

@@ -31,13 +31,21 @@ public:
 
 	void SetSceneChangeCnt();
 	const int SceneMax = 1;
+
+	std::vector<int> Enemy5Cnt;
+	std::vector<Math::Vector2> Enemy5PosCnt;
+
 private:
 	
 	int NowScene = Title;
 	bool KeyFlg = false;
+	bool SceneCh = false;
+
+	int Count = 0;
+
+	int EnemyInter = 250;
 
 	void SceneUp();
-
 
 	//ƒV[ƒ“‘JˆÚ‚Ì•`‰æ
 	void SC_Draw0();
@@ -45,6 +53,7 @@ private:
 
 	//
 	Math::Vector2 BackPos[18][32];
+
 
 
 public:
