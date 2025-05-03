@@ -41,7 +41,7 @@ public:
 	void EnemyPop();
 
 	int  CostSet(int i);
-	POINT mousePos;
+	POINT mousePos = {0,0};
 	//MaxH‚ÆMaxW‚ÍŠî€(HitPos)‚©‚ç”¼•ª‚Ì‹——£‚ğ‚Æ‚Á‚Ä”ÍˆÍ‚Æ‚·‚é
 	bool MousePosHit(Math::Vector2 HitPos, float MaxH ,float MaxW);
 
@@ -75,14 +75,30 @@ private:
 	KdTexture SterTex;
 	KdTexture PowerTex;
 	KdTexture StetasTex;
+	KdTexture StetasSPTex;
+	
+	KdTexture BulletIconTex[BulletMax];
 
+
+	NumDraw* SteNum[6];
+	void SteNumUpdate();
+	void SteNumDraw();
 
 	void TitleUpdate();
 	void TitleDraw();
 	std::vector<Math::Vector2> SterCnt;
 
+	void PowerUpdate();
 	void PowerUPDraw();
+	//G‚ê‚Ä‚¢‚éƒAƒCƒRƒ“‚Ì”Ô†‚ğ•Û‘¶
+	int Repla = -1;
+	int ReplaMain = -1;
+	int ReplaSub = -1;
 
+	void ReplaUpdate();
+	void ReplaPostUpdate();
+
+	int MouseIconCnt = 0;
 	Math::Vector3 Power1Pos = { -50,-50,0 };
 	Math::Vector3 Power2Pos = { 200,-50,0 };
 	Math::Vector3 Power3Pos = { 450,-50,0 };

@@ -50,17 +50,17 @@ void Enemy::Update()
 			{
 				for (auto A : PLAYER.SPBullet)
 				{
-					if (isColliding(A->GetPos(), {1280,64},PLAYER.GetPDeg(), Pos, 24))
+					if (isColliding(A->GetPos(), { 1280,64 }, PLAYER.GetPDeg(), Pos, 24))
 					{
-						Dmg = A->GetATK() - DEF;
+						int Atk = A->GetATK();
+						if (PLAYER.BulletSP[Laesr]) Atk + PLAYER.Level * 0.4;
+						Dmg = Atk - DEF;
 						HP -= Dmg;
 						Hit = true;
-						
+
 						Dmgnum.push_back(new NumDraw({ Pos.x ,Pos.y }, Dmg));
 						DeathUpdate(this);
-
 					}
-
 				}
 			}
 	}
@@ -114,10 +114,17 @@ void Enemy::Update()
 		if (SCENE.HitJudge(Pos, A->GetPos(), A->GetRectSize() * A->GetSize() / 1.5))
 		{
 			//ダメージ
-			if (A->EType == 2)
+			if (A->EType == 2 || (A->EType == 4 && PLAYER.BulletSP[Gravity]))
 			{
-				HP-= 3;
-				Dmgnum.push_back(new NumDraw({ Pos.x ,Pos.y }, 3));
+				int Dmg = 3;
+				if (PLAYER.BulletSP[Fire]) Dmg += PLAYER.Level * 0.5;
+				if (A->EType == 4)
+				{
+					Dmg = 1;
+					Dmg += PLAYER.Level * 0.1;
+				}
+				HP-= Dmg;
+				Dmgnum.push_back(new NumDraw({ Pos.x ,Pos.y }, Dmg));
 			}
 			//グラビティ
 			if (A->EType == 4)
@@ -183,6 +190,13 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
 			{
 				//ダメージ計算
 				float Dmg = (*A)->GetATK() - DEF;
+				//流星
+				if ((*A)->BulletType == Commet && PLAYER.BulletPower[Commet])
+				{
+					int Dm = DEF / 4;
+					if (Dm <= 0)Dm = 1;
+					Dmg += Dm;
+				}
 				//連続の時
 				if ((*A)->BulletType == Conti)
 				{
@@ -193,20 +207,25 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
 
 				//感染時
 				if (Virus)Dmg = (*A)->GetATK() * 1.2 - DEF;
+				if (Virus1)Dmg = (*A)->GetATK() * 1.2 * 1.2- DEF;
 				//守備無視
-				if ((*A)->MoonF) Dmg = (*A)->GetATK();
-				
+				if ((*A)->MoonF)
+				{
+					Dmg = (*A)->GetATK();
+					if(PLAYER.BulletSP[Moon])Dmg = (*A)->GetATK() + DEF;
+				}
 				//状態異常※ウイルス
 				if ((*A)->VirusF)
 				{
+					if (Virus)Virus1 = true;
 					Virus = true;
-					VirusCnt = 500;
+					VirusCnt = 500 + PLAYER.BulletPower[Virus] * 12;
 				}
 				//状態異常※毒
 				if ((*A)->PoizonF)
 				{
 					Poizon = true;
-					PoizonCnt = 30;
+					PoizonCnt = 30 + PLAYER.BulletPower[Poizon] * 12;
 				}
 
 				//最低値保証
@@ -217,7 +236,14 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
 				//エネルギー回復
 				if ((*A)->SunF)
 				{
-					PLAYER.SetEnergy(PLAYER.GetEnergy() + (int)Dmg);
+					int Plas = 0;
+					if (PLAYER.BulletSP[Sun])
+					{
+						Plas += PLAYER.BulletPower[Sun] / 10;
+						if (Plas <= 0) Plas = 1;
+					}
+					PLAYER.SetHP(PLAYER.GetHP() + (int)Dmg + Plas);
+					if (PLAYER.GetHP() > PLAYER.GetMaxHP()) PLAYER.SetHP(PLAYER.GetMaxHP());
 				}
 
 
@@ -244,13 +270,21 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
 
 				if((*A)->BulletType == Fire) PLAYER.BulletExp.push_back(new Explosion(72, 5, 2));
 				else if ((*A)->BulletType == Gravity) PLAYER.BulletExp.push_back(new Explosion(128, 5, 4));
-				else if((*A)->BulletType == SDust)PLAYER.BulletExp.push_back(new Explosion(60,10));
 				else PLAYER.BulletExp.push_back(new Explosion(18, 1, 3));
 
 				DeathUpdate(this);
-				if ((*A)->BulletType == Penetration || (*A)->BulletType == RailGun);
+				if ((*A)->BulletType == Penetration || (*A)->BulletType == RailGun 
+					|| ((*A)->BulletType == HighPower && PLAYER.BulletSP[HighPower]));
 				else 
 				{
+					if ((*A)->BulletType == Burst && PLAYER.BulletSP[Burst])
+					{
+						for (int i = 0; i < PLAYER.BurstMax; i++)
+						{
+							PLAYER.BurstDeg += 360 / PLAYER.BurstMax;
+							PLAYER.BurstBullet.push_back(new Bullet(BurstP));
+						}
+					}
 					// BuからAを削除
 					A = Bu.erase(A); // イテレータを次の要素に進める
 					continue; // erase後はAをインクリメントしない
@@ -408,11 +442,19 @@ void Enemy::Condisyon()
 	if (Virus)
 	{
 		VirusCnt--;
-		if (VirusCnt < 0)Virus = false;
+		if (VirusCnt < 0)
+		{
+			Virus = false;
+			Virus1 = false;
+		}
 	}
 	if (Poizon)
 	{
-		HP--;
+		int Dmg = 1;
+		if (PLAYER.BulletSP[Poizon]) Dmg += PLAYER.Level * 0.1;
+
+		HP -= Dmg;
+		Dmgnum.push_back(new NumDraw({ Pos.x ,Pos.y }, Dmg));
 		DeathUpdate(this);
 
 		PoizonCnt--;

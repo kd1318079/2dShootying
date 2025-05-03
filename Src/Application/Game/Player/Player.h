@@ -81,7 +81,7 @@ public:
 
 	bool ReCnt = false;
 
-	const int BurstMax = 8;
+	int BurstMax = 8;
 	int BurstDeg = 0;
 	Math::Vector2 BurstPos;
 
@@ -122,6 +122,8 @@ public:
 	
 	int Drone = 0;
 	bool PowerUP(int A);
+	
+	int StaCnt = 0;
 private:
 	int MaxHP = 10;
 	int HP = MaxHP;
@@ -130,7 +132,6 @@ private:
 
 	int EnergyMax = 100;
 
-	int Lv = 0;
 	static const int MaxLv = 1000;
 	float EXP_Lv[MaxLv];
 	float EXPSum;
@@ -166,7 +167,7 @@ private:
 	void LaesrFCnt();
 
 	bool LaesrF = false;
-	const int LeasrMax = 60;
+	int LeasrMax = 60;
 
 	//Matrix
 	Math::Matrix Scale;
@@ -204,6 +205,7 @@ private:
 
 public:
 	int		GetHP() { return HP; }
+	int		GetMaxHP() { return MaxHP; }
 	int		GetDEF() { return DEF; }
 	int		GetEnergy() { return Energy; }
 	void	SetHP(int A) { HP = A; }
@@ -212,6 +214,7 @@ public:
 
 
 	float GetSpd() { return PlayerSpd; }
+	float GetDegSpd() { return DegSpeed; }
 	float GetPDeg() { return PlayerDeg; }
 	Math::Vector2 GetPos() { return Pos; }
 	Math::Matrix GetMatrix() { return Mat; }

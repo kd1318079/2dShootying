@@ -11,7 +11,7 @@ void C_Player::ReturnInit()
 	HP = MaxHP;
 	DEF = 3;
 
-	PlayerSpd = 1;
+	PlayerSpd = 0.5;
 	DegSpeed = 0.5;
 
 	Wave = 0;
@@ -50,7 +50,6 @@ void C_Player::ReturnInit()
 	BulletAT[Sun] = 10;
 	BulletAT[Poizon] = 3;
 	BulletAT[Conti] = 1;
-	BulletAT[SDust] = 30;
 
 	for (int i = 0; i < BulletMax; i++)
 	{
@@ -714,12 +713,16 @@ void C_Player::PlayerAttack()
 	//特殊
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000 && SPBu)
 	{
-		if(SPBulletCnt == Laesr) LaesrCnt = LeasrMax;
-
+		if (SPBulletCnt == Laesr)
+		{
+			LaesrCnt = LeasrMax + BulletPower[Laesr] * 12;
+		}
 		if (SPBulletCnt == Charge)
 		{
 			ChargeCnt++;
-			if (ChargeCnt >= 20)
+			int Count = 20;
+			if (BulletSP[Charge]) Count = 18;
+			if (ChargeCnt >= Count)
 			{
 				ChargeCnt = 0;
 				ChargeLv++;
@@ -800,7 +803,6 @@ void C_Player::LvUp()
 	int A = Level;
 	if (Score > EXP_Lv[A + 1])
 	{
-
 		Level++;
 		int A = rand() % 6;
 		if (A == HighPower)A++;
@@ -854,7 +856,7 @@ void C_Player::FireExpF()
 				PLAYER.ExpPos = (*A)->GetPos();
 				// BulletTypeに応じてExplosionを追加
 				if ((*A)->BulletType == Fire)
-					PLAYER.BulletExp.push_back(new Explosion(72,5,2));
+					PLAYER.BulletExp.push_back(new Explosion(72 + PLAYER.BulletPower[Fire] * 12, 5, 2));
 				else
 					PLAYER.BulletExp.push_back(new Explosion(40,1,3));
 
@@ -878,16 +880,13 @@ void C_Player::FireExpF()
 				(*A)->GraCnt = 0;
 				PLAYER.ExpPos = (*A)->GetPos();
 				A = PLAYER.SPBullet.erase(A);
-				PLAYER.BulletExp.push_back(new Explosion(128, 5, 4));
+				PLAYER.BulletExp.push_back(new Explosion(128 + PLAYER.BulletPower[Gravity] * 12, 5, 4));
 				continue;
 			}
 			else if ((*A)->SDF) {
 				PLAYER.ExpPos = (*A)->GetPos();
 				// BulletTypeに応じてExplosionを追加
-				if ((*A)->BulletType == SDust)
-					PLAYER.BulletExp.push_back(new Explosion(120, 10));
-				else
-					PLAYER.BulletExp.push_back(new Explosion(18, 1, 3));
+				PLAYER.BulletExp.push_back(new Explosion(18, 1, 3));
 
 				// 現在の要素を安全に削除し、イテレーターを更新
 				A = Bu.erase(A); // eraseは次の要素を指す有効なイテレーターを返します
@@ -898,6 +897,8 @@ void C_Player::FireExpF()
 			}
 		}
 		};
+	BurstMax = BulletPower[Burst] + 8; 
+
 	FireFlg(MainBullet);
 	FireFlg(SubBullet);
 	FireFlg(SPBullet);
@@ -1164,13 +1165,20 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 	//弾の発射をしてクールタイムをreturnで返す
 	if (A == Straight)
 	{
-		Bu.push_back(new Bullet(A));
+		if (BulletPower[Straight])
+		{
+			for (StaCnt = 0; StaCnt < 3; StaCnt++)
+			{
+				Bu.push_back(new Bullet(A));
+			}
+		}else Bu.push_back(new Bullet(A));
+
 		return 10;
 	}
 	else if (A == fast)
 	{
 		Bu.push_back(new Bullet(A));
-		return 15;
+		return 15 - BulletPower[fast] * 0.5;
 	}
 	else if (A == Missile)
 	{
@@ -1182,6 +1190,11 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 	{
 		if (AutoAttack)
 		{
+			if (BulletSP[Auto])
+			{
+				for(int i = 0; i < Level * 0.5 + 1; i++)
+					Bu.push_back(new Bullet(A));
+			}else 
 			Bu.push_back(new Bullet(A));
 			return 10;
 		}
@@ -1229,11 +1242,17 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 	else if (A == Homing)
 	{
 		Bu.push_back(new Bullet(A));
+		if (BulletSP[Homing])return 12 - Level * 0.1;
 		return 12;
 	}
 	else if (A == RailGun)
 	{
-		Bu.push_back(new Bullet(A));
+		if (BulletSP[RailGun])
+		{
+			for (int i = 0; i < Level / 10 + 1; i++)
+				Bu.push_back(new Bullet(A));
+		}
+		else Bu.push_back(new Bullet(A));
 		return 80;
 	}
 	else if (A == Chain)
@@ -1253,12 +1272,18 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 	}
 	else if (A == Commet)
 	{
-		Bu.push_back(new Bullet(A));
+		for(int i = 0; i < BulletPower[Commet] * 3 +1;i++)
+			Bu.push_back(new Bullet(A));
 		return 5;
 	}
 	else if (A == Sun)
 	{
-		Bu.push_back(new Bullet(A));
+		if (BulletSP[Sun])
+		{
+			for (int i = 0; i < Level / 5 + 1; i++)
+				Bu.push_back(new Bullet(A));
+		}
+		else Bu.push_back(new Bullet(A));
 		return 10;
 	}
 	else if (A == Poizon)
@@ -1268,14 +1293,15 @@ int C_Player::Attack(std::vector<Bullet*>& Bu, int A,int B)
 	}
 	else if (A == Conti)
 	{
-		Bu.push_back(new Bullet(A));
+		if (BulletSP[Conti])
+		{
+			for (int i = 0; i < Level / 10 + 1; i++)
+				Bu.push_back(new Bullet(A));
+		}
+		else Bu.push_back(new Bullet(A));
 		return 10;
 	}
-	else if (A == SDust)
-	{
-		Bu.push_back(new Bullet(A));
-		return 10;
-	}
+	
 
 	return B;
 }

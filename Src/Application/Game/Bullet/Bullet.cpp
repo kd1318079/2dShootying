@@ -20,6 +20,35 @@ Bullet::Bullet(int A)
 		M.x = cos(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 16 - 8)));
 		M.y = sin(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 16 - 8)));
 	}
+	if (BulletType == Straight && PLAYER.BulletSP[Straight])
+	{
+		int DEG = 30;
+		if (PLAYER.StaCnt == 1)
+		{
+			M.x = cos(ToRadians(PLAYER.GetPDeg() + 90 + 30));
+			M.y = sin(ToRadians(PLAYER.GetPDeg() + 90 + 30));
+		}
+		if (PLAYER.StaCnt == 2)
+		{
+			M.x = cos(ToRadians(PLAYER.GetPDeg() + 90 - 30));
+			M.y = sin(ToRadians(PLAYER.GetPDeg() + 90 - 30));
+		}
+	}
+	if (BulletType == Sun && PLAYER.BulletSP[Sun])
+	{
+		M.x = cos(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 4 - 2)));
+		M.y = sin(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 4 - 2)));
+	}
+	if (BulletType == Conti && PLAYER.BulletSP[Conti])
+	{
+		M.x = cos(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 16 - 8)));
+		M.y = sin(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 16 - 8)));
+	}
+	if (BulletType == RailGun && PLAYER.BulletSP[RailGun])
+	{
+		M.x = cos(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 8 - 4)));
+		M.y = sin(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 8 - 4)));
+	}
 	Attack = PLAYER.BulletAT[BulletType];
 	//初期値の設定
 	switch (BulletType)
@@ -88,9 +117,6 @@ Bullet::Bullet(int A)
 	case Conti:
 		ATConti(M);
 		break;
-	case SDust:
-		ATSDust(M);
-		break;
 	default:
 		break;
 	}
@@ -152,14 +178,14 @@ void Bullet::Update()
 		}
 	}
 	if (APP.count % 2 == 0)CELLGET(Pos, &BHitJ);
-	if (BulletType == Burst || BulletType == Fire || BulletType == SDust ||BulletType == Gravity)DecreCh();
+	if (BulletType == Burst || BulletType == Fire || BulletType == Gravity)DecreCh();
 	if (BulletType == Homing && !HomingF)
 	{
 		for (auto A : GM.AllEnemy)
 		{
 			if (SCENE.CellHit(A->EHitJ, GetCell()))
 			{
-				if (SCENE.HitJudge(Pos, A->GetPos(), 64*8))
+				if (SCENE.HitJudge(Pos, A->GetPos(), 64*8 + PLAYER.BulletPower[Homing] * 10))
 				{
 					HomingF = true;
 					HomingEnemy = A;
@@ -211,15 +237,6 @@ void Bullet::Update()
 			Move = { 8.0f, 0.0f }; // デフォルト動作（直進）
 		}
 	}
-	if (BulletType == SDust && SDCnt >= 0)
-	{
-		SDCnt--;
-		if (SDCnt < 0)
-		{
-			SDCnt = 0;
-			SDF = true;
-		}
-	}
 	if (BulletType == Gravity && GraCnt >= 0)
 	{
 		GraCnt--;
@@ -259,6 +276,8 @@ void Bullet::ATStraight(Math::Vector2 A)
 
 void Bullet::ATFast(Math::Vector2 A)
 {
+	if (PLAYER.BulletSP[fast])
+		Attack += PLAYER.Level * 0.5;
 	float Spd;
 	Spd = 20;
 	
@@ -305,6 +324,7 @@ void Bullet::ATAuto(Math::Vector2 A)
 
 	//引数未使用
 	Move = { PLAYER.AutoX,PLAYER.AutoY };
+
 	AutoDeg = PLAYER.AutoDeg;
 }
 
@@ -359,6 +379,9 @@ void Bullet::ATBurstP(Math::Vector2 A)
 void Bullet::ATPenetration(Math::Vector2 A)
 {
 	Attack += PLAYER.BulletAT[Penetration];
+	if(PLAYER.BulletSP[Penetration])
+		Attack += PLAYER.BulletAT[Penetration] + PLAYER.Level * 0.5;
+
 	float Spd;
 	Spd = 10;
 	Move = { Spd,Spd };
@@ -442,6 +465,7 @@ void Bullet::ATRailGun(Math::Vector2 A)
 
 void Bullet::ATChain(Math::Vector2 A)
 {
+	Attack += PLAYER.BulletPower[Chain] * 3;
 	float Spd;
 	Spd = 10;
 	Move = { Spd,Spd };
@@ -560,11 +584,7 @@ void Bullet::DecreCh()
 	{
 		FireF = true;
 	}
-	else if (SDCnt <= 0 && SDCnt == SDust)
-	{
-		SDF = true;
-	}
-
+	
 
 }
 

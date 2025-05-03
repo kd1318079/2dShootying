@@ -8,11 +8,12 @@ NumDraw::NumDraw(Math::Vector2 A, int B, const int Timer)
 	Cnt = Timer;
 	NumTex = NUMTEX.GetTex();
 	ScoreTex = NUMTEX.GetSTex();
+	StetasTex = NUMTEX.GetSteTex();
 }
 
 
 
-void NumDraw::Draw(int ESize, const bool A)
+void NumDraw::Draw(int ESize, const bool A, const bool C)
 {
 	int digCnt = 0;
 	int num = Dmg;
@@ -69,7 +70,15 @@ void NumDraw::Draw(int ESize, const bool A)
 				SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(size) * Math::Matrix::CreateTranslation(Pos.x + B, Pos.y, 0));
 				SHADER.m_spriteShader.DrawTex(ScoreTex, rect, 1);
 			}
-			else
+			else if (C)
+			{
+				float size = 0.4;
+				B = 102 * size * j;
+				rect = { 120 * digit,0,120,120 };
+				SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(size) * Math::Matrix::CreateTranslation(Pos.x + B, Pos.y, 0));
+				SHADER.m_spriteShader.DrawTex(StetasTex, rect, 1);
+			}
+			else 
 			{
 				rect = { 120 * digit,0,120,120 };
 				SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(0.1) * Math::Matrix::CreateTranslation(Pos.x - B, Pos.y, 0));

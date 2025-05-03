@@ -35,7 +35,6 @@ typedef enum
 	Sun,
 	Poizon,
 	Conti,
-	SDust,
 	BulletMax,
 }BulletTypeNum;
 

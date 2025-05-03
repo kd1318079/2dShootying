@@ -53,6 +53,7 @@ public:
 
 	//ƒEƒCƒ‹ƒX
 	bool Virus = false;
+	bool Virus1 = false;
 	int VirusCnt = 0;
 	//“Å
 	bool Poizon = false;

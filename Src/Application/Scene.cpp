@@ -25,7 +25,7 @@ void Scene::Release()
 
 void Scene::ImGuiUpdate()
 {
-	return;
+	//return;
 
 	ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiSetCond_Once);
 	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiSetCond_Once);

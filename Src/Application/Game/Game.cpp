@@ -14,7 +14,14 @@ void MainGame::Init()
 	SterTex.Load("Texture/others/Ster.png");
 	PowerTex.Load("Texture/others/PowerUP.png");
 	StetasTex.Load("Texture/others/Stetas.png");
-	
+	StetasSPTex.Load("Texture/others/StetasSP.png");
+	for (int i = 0; i < BulletMax; i++)
+	{
+		char str[100];
+		sprintf_s(str, sizeof(str), "Texture/BulletIcon/Bullet%d.png", i);
+		BulletIconTex[i].Load(str);//scene.hにも書いた通りキャラ名と添え字でキャラ別のTextureをつくる
+	}
+
 	for (int i = 0; i < 18; i++)
 	{
 		for (int j = 0; j < 32; j++)
@@ -22,12 +29,21 @@ void MainGame::Init()
 			BackPos[i][j] = { (float) - 640 + 40 * j , (float)-340.0 + 40 * i};
 		}
 	}
+
+	SteNum[0] = new NumDraw({-470 , 285}, 0);
+	SteNum[1] = new NumDraw({-470 , 240}, 0);
+	SteNum[2] = new NumDraw({-470 , 195}, 0);
+	SteNum[3] = new NumDraw({-470 , 150}, 0);
+	SteNum[4] = new NumDraw({-470 , 102}, 0);
+	SteNum[5] = new NumDraw({-470 , 48}, 0);
+
 }
 
 void MainGame::Update()
 {
 	m_UI.Update();
 	Count++;
+	SteNumUpdate();
 	MouseGet();
 	if(NowScene == Title)
 	{
@@ -70,9 +86,9 @@ void MainGame::Update()
 	{
 
 	}
-	else if (NowScene == LevelUp)
+	else if (NowScene == LevelUp || NowScene == Select)
 	{
-
+		PowerUpdate();
 	}
 
 
@@ -117,6 +133,11 @@ void MainGame::Release()
 	SterTex.Release();
 	PowerTex.Release();
 	StetasTex.Release();
+	StetasSPTex.Release();
+	for (int i = 0; i < BulletMax; i++)
+	{
+		BulletIconTex[i].Release();
+	}
 }
 
 void MainGame::SceneUp()
@@ -146,7 +167,7 @@ void MainGame::SceneUp()
 		//Bulletの入れ替え
 		if (NowScene == LevelUp || NowScene == Select)
 		{
-
+			if(MouseIconCnt == 0) ReplaUpdate();
 
 		}
 
@@ -202,8 +223,11 @@ void MainGame::SceneUp()
 			}
 		}
 	}
-	else KeyFlg = false;
-
+	else
+	{
+		KeyFlg = false;
+		if (MouseIconCnt != 0) ReplaPostUpdate();
+	}
 	if (SceneCT && !SceneCC)
 	{
 		switch (NowScene)
@@ -262,6 +286,29 @@ void MainGame::SC_Draw0()
 		}
 	}
 
+}
+
+void MainGame::SteNumUpdate()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		SteNum[i]->Cnt++;
+	}
+	SteNum[0]->Dmg = PLAYER.Wave;
+	SteNum[1]->Dmg = PLAYER.Level;
+	SteNum[2]->Dmg = PLAYER.GetMaxHP();
+	SteNum[3]->Dmg = PLAYER.GetDEF();
+	SteNum[4]->Dmg = PLAYER.GetSpd() * 100;
+	SteNum[5]->Dmg = PLAYER.GetDegSpd() * 100;
+
+}
+
+void MainGame::SteNumDraw()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		SteNum[i]->Draw(0, false , true);
+	}
 }
 
 void MainGame::TitleUpdate()
@@ -324,6 +371,73 @@ void MainGame::TitleDraw()
 	SHADER.m_spriteShader.DrawTex_Color(&QuitTex, rect,C);
 }
 
+void MainGame::PowerUpdate()
+{
+	//アイコンとの当たり判定
+	//基準
+	Math::Vector3 Sta = { -640 + 24 + 12, 360 - 664 + 12 ,0 };
+	//弾アイコン描画
+
+	for (int i = 0; i < PLAYER.OthersBullet.size(); i++)
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+
+		if (Repla == -1 || Repla == i)
+		{
+			if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+			{
+				Repla = i;
+				break;
+			}
+			else Repla = -1;
+		}
+	}
+	//Main
+	Sta.y += 240 - 4;
+	for (int i = 0; i < PLAYER.MainBu.size(); i++)
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+		if (ReplaMain == -1 || ReplaMain == i)
+		{
+			if (MouseIconCnt == HighPower || MouseIconCnt == Gravity || MouseIconCnt == Charge
+				|| MouseIconCnt == Laesr || MouseIconCnt == RailGun); else
+			{
+				if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+				{
+					ReplaMain = i;
+					break;
+				}
+				else ReplaMain = -1;
+			}
+		}
+	}
+	//Sub
+	Sta.y -= 120 + 4;
+	for (int i = 0; i < PLAYER.SubBu.size(); i++)
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+		if (MouseIconCnt == HighPower || MouseIconCnt == Gravity || MouseIconCnt == Charge
+			|| MouseIconCnt == Laesr || MouseIconCnt == RailGun); else
+		{
+			if (ReplaSub == -1 || ReplaSub == i)
+			{
+				if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+				{
+					ReplaSub = i;
+					break;
+				}
+				else ReplaSub = -1;
+			}
+		}
+	}
+}
+
 void MainGame::PowerUPDraw()
 {
 	//背景の黒
@@ -335,13 +449,67 @@ void MainGame::PowerUPDraw()
 	rect = { 0,0 ,400,720 };
 	SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateTranslation(StetasPos));
 	SHADER.m_spriteShader.DrawTex(&StetasTex, rect, 1, { 0,0.5 });
+	if(PLAYER.SPBu)	SHADER.m_spriteShader.DrawTex(&StetasSPTex, rect, 1, { 0,0.5 });
 
+	SteNumDraw();
 
-	rect = { 0,0 ,500,1000 };
+	rect = { 0,0 ,24,24 };
+	//基準
+	Math::Vector3 Sta = { -640 + 24 + 12, 360 - 664 +12 ,0};
+	//弾アイコン描画
+
+	for (int i = 0;i < PLAYER.OthersBullet.size();i++ )
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+		float Size = 1;
+		if (Repla == i)Size *= 1.2;
+		SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(Size) * Math::Matrix::CreateTranslation(BPos));
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[0], rect, 1);
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[PLAYER.OthersBullet[i]], rect, 1);
+	}
+	//Main
+	Sta.y += 240 - 4;
+	for (int i = 0; i < PLAYER.MainBu.size(); i++)
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+		float Size = 1;
+		if (ReplaMain == i)Size *= 1.2;
+		SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(Size) * Math::Matrix::CreateTranslation(BPos));
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[0], rect, 1);
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[PLAYER.MainBu[i].Cnt], rect, 1);
+	}
+	//Sub
+	Sta.y -= 120 + 4;
+	for (int i = 0; i < PLAYER.SubBu.size(); i++)
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+		float Size = 1;
+		if (ReplaSub == i)Size *= 1.2;
+		SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(Size) * Math::Matrix::CreateTranslation(BPos));
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[0], rect, 1);
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[PLAYER.SubBu[i].Cnt], rect, 1);
+	}
+
+	if (PLAYER.SPBu)
+	{
+		float Size = 1;
+		Sta = { -264,-300,0 };
+		if (MousePosHit({ Sta.x,Sta.y }, 24, 24))Size = 1.2;
+		SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateScale(Size) * Math::Matrix::CreateTranslation(Sta));
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[0], rect, 1);
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[PLAYER.SPBulletCnt], rect, 1);
+	}
 	//強化背景
 	//強化内容
 
 	//レベルアップ時のみ
+	rect = { 0,0 ,500,1000 };
 	if (NowScene == LevelUp)
 	{
 		float Size = 0.5;
@@ -365,6 +533,171 @@ void MainGame::PowerUPDraw()
 		POWERTEX.Draw(PLAYER.LevelCnt3, rect);
 	}
 
+	if (MouseIconCnt != 0)
+	{
+		rect = { 0,0 ,24,24 };
+		SHADER.m_spriteShader.SetMatrix(Math::Matrix::CreateTranslation(mousePos.x,mousePos.y,0));
+		SHADER.m_spriteShader.DrawTex(&BulletIconTex[MouseIconCnt], rect, 1, {0,1});
+	}
+
+}
+
+void MainGame::ReplaUpdate()
+{
+	//アイコンとの当たり判定
+	//基準
+	Math::Vector3 Sta = { -640 + 24 + 12, 360 - 664 + 12 ,0 };
+	//弾アイコン描画
+
+	for (int i = 0; i < PLAYER.OthersBullet.size(); i++)
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+		if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+		{
+			MouseIconCnt = PLAYER.OthersBullet[i];
+			PLAYER.OthersBullet[i] = 0;
+			break;
+		}
+	}
+	//Main
+	Sta.y += 240 - 4;
+	for (int i = 0; i < PLAYER.MainBu.size(); i++)
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+		if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+		{
+			MouseIconCnt = PLAYER.MainBu[i].Cnt;
+			PLAYER.MainBu[i].Cnt = 0;
+			break;
+		}
+	}
+	//Sub
+	Sta.y -= 120 + 4;
+	for (int i = 0; i < PLAYER.SubBu.size(); i++)
+	{
+		Math::Vector3 BPos = Sta;
+		BPos.x += i % 9 * 32;
+		if (i >= 9)BPos.y -= 32;
+		if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+		{
+			MouseIconCnt = PLAYER.SubBu[i].Cnt;
+			PLAYER.SubBu[i].Cnt = 0;
+			break;
+		}
+	}
+	//SP
+	if (MousePosHit({ -264,-300  }, 24, 24))
+	{
+		MouseIconCnt = PLAYER.SPBulletCnt;
+		PLAYER.SPBulletCnt = 0;
+	}
+
+}
+
+void MainGame::ReplaPostUpdate()
+{
+	//基準
+	Math::Vector3 Sta = { -640 + 24 + 12, 360 - 664 + 12 ,0 };
+	//弾アイコン描画
+
+	if (MouseIconCnt != HighPower && MouseIconCnt != Charge && MouseIconCnt != Laesr
+		&& MouseIconCnt != Gravity && MouseIconCnt != RailGun)
+	{
+		for (int i = 0; i < PLAYER.OthersBullet.size(); i++)
+		{
+			Math::Vector3 BPos = Sta;
+			BPos.x += i % 9 * 32;
+			if (i >= 9)BPos.y -= 32;
+			if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+			{
+				for (int j = 0; j < PLAYER.OthersBullet.size(); j++)
+				{
+					if (PLAYER.OthersBullet[j] == 0)
+					{
+						PLAYER.OthersBullet[j] = PLAYER.OthersBullet[i];
+						break;
+					}
+				}
+				PLAYER.OthersBullet[i] = MouseIconCnt;
+				MouseIconCnt = 0;
+				break;
+			}
+		}
+		//Main
+		Sta.y += 240 - 4;
+		for (int i = 0; i < PLAYER.MainBu.size(); i++)
+		{
+			Math::Vector3 BPos = Sta;
+			BPos.x += i % 9 * 32;
+			if (i >= 9)BPos.y -= 32;
+			if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+			{
+				for (int j = 0; j < PLAYER.OthersBullet.size(); j++)
+				{
+					if (PLAYER.OthersBullet[j] == 0)
+					{
+						PLAYER.OthersBullet[j] = PLAYER.MainBu[i].Cnt;
+						break;
+					}
+				}
+				PLAYER.MainBu[i].Cnt = MouseIconCnt;
+				MouseIconCnt = 0;
+				break;
+			}
+		}
+		//Sub
+		Sta.y -= 120 + 4;
+		for (int i = 0; i < PLAYER.SubBu.size(); i++)
+		{
+			Math::Vector3 BPos = Sta;
+			BPos.x += i % 9 * 32;
+			if (i >= 9)BPos.y -= 32;
+			if (MousePosHit({ BPos.x, BPos.y }, 24, 24))
+			{
+				for (int j = 0; j < PLAYER.OthersBullet.size(); j++)
+				{
+					if (PLAYER.OthersBullet[j] == 0)
+					{
+						PLAYER.OthersBullet[j] = PLAYER.SubBu[i].Cnt;
+						break;
+					}
+				}
+				PLAYER.SubBu[i].Cnt = MouseIconCnt;
+				MouseIconCnt = 0;
+				break;
+			}
+		}
+	}
+	//SP
+	if (MousePosHit({ -264,-300 }, 24, 24))
+	{
+		for (int j = 0; j < PLAYER.OthersBullet.size(); j++)
+		{
+			if (PLAYER.OthersBullet[j] == 0)
+			{
+				PLAYER.OthersBullet[j] = PLAYER.SPBulletCnt;
+				break;
+			}
+		}
+		PLAYER.SPBulletCnt = MouseIconCnt;
+		MouseIconCnt = 0;
+	}
+	if (MouseIconCnt != 0)
+	{
+		for (int i = 0; i < PLAYER.OthersBullet.size(); i++)
+		{
+			if (PLAYER.OthersBullet[i] == 0)
+			{
+				PLAYER.OthersBullet[i] = MouseIconCnt;
+				break;
+			}
+		}
+	}
+	MouseIconCnt = 0;
 }
 
 void MainGame::SceneChangeDraw(int i)

@@ -10,11 +10,12 @@ public:
 	Math::Vector2 Pos;
 	int Dmg = 0;
 	int Cnt = 0;
-	void Draw(int ESize , const bool A = false);
+	void Draw(int ESize, const bool A = false, const bool C = false);
 	
 private:
 	KdTexture* NumTex;
 	KdTexture* ScoreTex;
+	KdTexture* StetasTex;
 
 };
 
