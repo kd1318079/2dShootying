@@ -61,6 +61,9 @@
     <Filter Include="Src\Application\Game\UI">
       <UniqueIdentifier>{0913127f-71f0-4113-8db9-9b958d4682eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Application\Game\UI\Score">
+      <UniqueIdentifier>{b1f82fa7-c2c8-42a6-8b3f-ad06ef9ed11a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Pch.h">
@@ -207,6 +210,12 @@
     <ClInclude Include="Src\Application\Game\Bullet\EnemyBullet.h">
       <Filter>Src\Application\Game\Bullet</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Application\Game\UI\Score\ScoreUI.h">
+      <Filter>Src\Application\Game\UI\Score</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Application\Game\PowerDraw.h">
+      <Filter>Src\Application\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Pch.cpp">
@@ -295,6 +304,15 @@
     </ClCompile>
     <ClCompile Include="Src\Application\Game\Bullet\EnemyBullet.cpp">
       <Filter>Src\Application\Game\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Game\NumDraw.cpp">
+      <Filter>Src\Application\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Game\UI\Score\ScoreUI.cpp">
+      <Filter>Src\Application\Game\UI\Score</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Application\Game\UI\UITex.cpp">
+      <Filter>Src\Application\Game\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

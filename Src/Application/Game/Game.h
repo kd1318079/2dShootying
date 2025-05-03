@@ -1,8 +1,9 @@
 #pragma once
-#include"../Scene.h"
-#include"Player/Player.h"
-#include"Enemy/Enemy.h"
-#include"../Define.h"
+#include "../Scene.h"
+#include "Player/Player.h"
+#include "Enemy/Enemy.h"
+#include "../Define.h"
+#include "UI/UI.h"
 
 class MainGame
 {
@@ -28,6 +29,7 @@ public:
 	//シーン変更時のタイプ
 	int SceneChangeCnt = 0;
 
+	UI m_UI;
 
 	void SetSceneChangeCnt();
 	const int SceneMax = 1;
@@ -35,10 +37,23 @@ public:
 	std::vector<int> Enemy5Cnt;
 	std::vector<Math::Vector2> Enemy5PosCnt;
 
+	void WaveUp();
+	void EnemyPop();
+
+	int  CostSet(int i);
+	POINT mousePos;
+	//MaxHとMaxWは基準(HitPos)から半分の距離をとって範囲とする
+	bool MousePosHit(Math::Vector2 HitPos, float MaxH ,float MaxW);
+
+	void SetScene(int i) { NowScene = i; }
+	int GetScene() { return NowScene; }
 private:
-	
+	void MouseGet();
+
+
 	int NowScene = Title;
 	bool KeyFlg = false;
+	bool KeyFlg1 = false;
 	bool SceneCh = false;
 
 	int Count = 0;
@@ -50,11 +65,29 @@ private:
 	//シーン遷移の描画
 	void SC_Draw0();
 
-
 	//
 	Math::Vector2 BackPos[18][32];
 
+	KdTexture TitleTex;
+	KdTexture TitleTextTex;
+	KdTexture StartTex;
+	KdTexture QuitTex;
+	KdTexture SterTex;
+	KdTexture PowerTex;
+	KdTexture StetasTex;
 
+
+	void TitleUpdate();
+	void TitleDraw();
+	std::vector<Math::Vector2> SterCnt;
+
+	void PowerUPDraw();
+
+	Math::Vector3 Power1Pos = { -50,-50,0 };
+	Math::Vector3 Power2Pos = { 200,-50,0 };
+	Math::Vector3 Power3Pos = { 450,-50,0 };
+	
+	Math::Vector3 StetasPos = { -640,0,0 };
 
 public:
 	static MainGame& GetInstance()

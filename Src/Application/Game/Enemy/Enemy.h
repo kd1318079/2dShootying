@@ -60,11 +60,14 @@ public:
 
 	bool GravityF = false;
 
+
+	int cost = 0;
 	int HP = 2000;
 private:
 	int TypeNum = 0;
 	bool Boss = false;
 
+	int ScoreP = 100;
 	int ATK;
 	int DEF;
 	int Size = 64;

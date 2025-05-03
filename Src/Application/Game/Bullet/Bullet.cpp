@@ -20,7 +20,7 @@ Bullet::Bullet(int A)
 		M.x = cos(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 16 - 8)));
 		M.y = sin(ToRadians(PLAYER.GetPDeg() + 90 + (rand() % 16 - 8)));
 	}
-
+	Attack = PLAYER.BulletAT[BulletType];
 	//èâä˙ílÇÃê›íË
 	switch (BulletType)
 	{
@@ -91,9 +91,6 @@ Bullet::Bullet(int A)
 	case SDust:
 		ATSDust(M);
 		break;
-	case SLight:
-		ATSLight(M);
-		break;
 	default:
 		break;
 	}
@@ -143,7 +140,8 @@ void Bullet::Update()
 			Math::Vector2 M;
 			float A = atan2(Pos.y - PLAYER.GetMousePos().y, Pos.x - PLAYER.GetMousePos().x) + ToRadians(180);
 			Deg = ToDegrees(A) - 90;
-			Move = { MissileSpd,MissileSpd };
+			float Spd = (rand() % 50) / 10;
+			Move = { MissileSpd + Spd,MissileSpd+Spd };
 			M.x = cos(A);
 			M.y = sin(A);
 			Move *= M;
@@ -249,7 +247,7 @@ void Bullet::Update()
 
 void Bullet::ATStraight(Math::Vector2 A)
 {
-	Attack = 200;
+	Attack +=PLAYER.BulletPower[Straight] * 3;
 	float Spd;
 	Spd = 8;
 	Move = { Spd,Spd };
@@ -273,30 +271,38 @@ void Bullet::ATFast(Math::Vector2 A)
 
 void Bullet::ATMissile(Math::Vector2 A)
 {
-	Attack = 100;
-	if (PLAYER.MissileCnt < 5)MissileLeft = true;
+	if(PLAYER.BulletSP[Missile])
+		Attack += PLAYER.Level * 0.9;
+	
+	if (PLAYER.MissileCnt < (2 + 2 * PLAYER.BulletPower[Missile]) / 2)
+		MissileLeft = true;
 	PLAYER.MissileCnt++;
-	if (PLAYER.MissileCnt >= 9)PLAYER.MissileCnt = 0;
-
+	if (PLAYER.MissileCnt > (2 + 2 * PLAYER.BulletPower[Missile]) - 1)
+		PLAYER.MissileCnt = 0;
+	int AC = (2 + 2 * PLAYER.BulletPower[Missile]);
+	float ABC = rand() % AC - AC / 2;
 	if (MissileLeft)
 	{
-		A.x = cos(ToRadians(PLAYER.GetPDeg() + 180));
-		A.y = sin(ToRadians(PLAYER.GetPDeg() + 180));
+		A.x = cos(ToRadians(PLAYER.GetPDeg() + 180 + ABC));
+		A.y = sin(ToRadians(PLAYER.GetPDeg() + 180 + ABC));
 		Deg += 90;
 	}
 	else
 	{
-		A.x = cos(ToRadians(PLAYER.GetPDeg()));
-		A.y = sin(ToRadians(PLAYER.GetPDeg()));
+		A.x = cos(ToRadians(PLAYER.GetPDeg()+ABC));
+		A.y = sin(ToRadians(PLAYER.GetPDeg()+ABC));
 		Deg -= 90;
 	}
-	Move = { MissileSpd,MissileSpd };
+
+	Move = { MissileSpd,MissileSpd};
 	//à⁄ìÆó Ç…äpìxÇèÊéZ
 	Move *= A;
 }
 
 void Bullet::ATAuto(Math::Vector2 A)
 {
+	Attack += PLAYER.BulletAT[Auto];
+
 	//à¯êîñ¢égóp
 	Move = { PLAYER.AutoX,PLAYER.AutoY };
 	AutoDeg = PLAYER.AutoDeg;
@@ -304,9 +310,11 @@ void Bullet::ATAuto(Math::Vector2 A)
 
 void Bullet::ATHighPower(Math::Vector2 A)
 {
+	Attack += PLAYER.BulletPower[HighPower] * 15;
 	float Spd;
 	Spd = 3;
-	
+	if (PLAYER.BulletSP[HighPower])Spd *= 5;
+
 	Move = { Spd,Spd };
 	//à⁄ìÆó Ç…äpìxÇèÊéZ
 	Move *= A;
@@ -322,6 +330,7 @@ void Bullet::ATHighPower(Math::Vector2 A)
 
 void Bullet::ATBurst(Math::Vector2 A)
 {
+
 	float Spd;
 	Spd = 10;
 	Move = { Spd,Spd };
@@ -349,6 +358,7 @@ void Bullet::ATBurstP(Math::Vector2 A)
 
 void Bullet::ATPenetration(Math::Vector2 A)
 {
+	Attack += PLAYER.BulletAT[Penetration];
 	float Spd;
 	Spd = 10;
 	Move = { Spd,Spd };
@@ -385,7 +395,7 @@ void Bullet::ATFire(Math::Vector2 A)
 
 void Bullet::ATLaesr(Math::Vector2 A)
 {
-	Attack = 120;
+	if (PLAYER.BulletSP[Laesr])Attack += PLAYER.Level * 0.4;
 	Pos = PLAYER.GetPos();
 	Deg = PLAYER.GetPDeg();
 	BTex = BuTEX.GetLaserTex();
@@ -418,7 +428,7 @@ void Bullet::ATHoming(Math::Vector2 A)
 
 void Bullet::ATRailGun(Math::Vector2 A)
 {
-	Attack = 50;
+	Attack += PLAYER.BulletAT[RailGun] * 3;
 
 	float Spd;
 	Spd = 30;
@@ -432,7 +442,6 @@ void Bullet::ATRailGun(Math::Vector2 A)
 
 void Bullet::ATChain(Math::Vector2 A)
 {
-	Attack = 2;
 	float Spd;
 	Spd = 10;
 	Move = { Spd,Spd };
@@ -445,7 +454,6 @@ void Bullet::ATChain(Math::Vector2 A)
 
 void Bullet::ATVirus(Math::Vector2 A)
 {
-	Attack = 10;
 	float Spd;
 	Spd = 6;
 	Move = { Spd,Spd };
@@ -459,7 +467,7 @@ void Bullet::ATVirus(Math::Vector2 A)
 
 void Bullet::ATMoon(Math::Vector2 A)
 {
-	Attack = 5;
+	Attack += PLAYER.BulletAT[Moon];
 	float Spd;
 	Spd = 10;
 	Move = { Spd,Spd };
@@ -473,7 +481,6 @@ void Bullet::ATMoon(Math::Vector2 A)
 
 void Bullet::ATCommet(Math::Vector2 A)
 {
-	Attack = 15;
 	float Spd;
 	Spd = 10;
 	Spd += (rand() % 10 - 5) / 100; 
@@ -488,7 +495,6 @@ void Bullet::ATCommet(Math::Vector2 A)
 
 void Bullet::ATSun(Math::Vector2 A)
 {
-	Attack = 2;
 	float Spd;
 	Spd = 6;
 	Move = { Spd,Spd };
@@ -502,7 +508,7 @@ void Bullet::ATSun(Math::Vector2 A)
 
 void Bullet::ATPoizon(Math::Vector2 A)
 {
-	Attack = 2;
+
 	float Spd;
 	Spd = 6;
 	Move = { Spd,Spd };
@@ -516,7 +522,7 @@ void Bullet::ATPoizon(Math::Vector2 A)
 
 void Bullet::ATConti(Math::Vector2 A)
 {
-	Attack = 2;
+	Attack += PLAYER.BulletAT[Conti];
 	float Spd;
 	Spd = 6;
 	Move = { Spd,Spd };
@@ -529,7 +535,6 @@ void Bullet::ATConti(Math::Vector2 A)
 
 void Bullet::ATSDust(Math::Vector2 A)
 {
-	Attack = 2;
 	float Spd;
 	Spd = 20;
 	Move = { Spd,Spd };
@@ -539,11 +544,6 @@ void Bullet::ATSDust(Math::Vector2 A)
 	//é©ã@ÇÃà⁄ìÆÇ…é·ä±âeãøÇéÛÇØÇÈÇÊÇ§Ç…
 	Move += PLAYER.GetMove() / 10;
 	SDCnt = 15;
-}
-
-void Bullet::ATSLight(Math::Vector2 A)
-{
-	
 }
 
 void Bullet::DecreCh()

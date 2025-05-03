@@ -7,6 +7,7 @@ public:
 	~Num();
 
 	KdTexture* GetTex() { return &NumTex; };
+	KdTexture* GetSTex() { return &NumSTex; };
 	static Num& GetInst()
 	{
 		static Num instance;
@@ -14,12 +15,14 @@ public:
 	}
 private:
 	KdTexture NumTex;
+	KdTexture NumSTex;
 
 };
 
 inline Num::Num()
 {
 	NumTex.Load("Texture/others/Num.png");
+	NumSTex.Load("Texture/UI/ScoreNum.png");
 }
 
 inline Num::~Num()

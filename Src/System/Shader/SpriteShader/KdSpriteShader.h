@@ -85,6 +85,12 @@ public:
 		DrawTex(tex, 0, 0, srcRect.width, srcRect.height, &srcRect, &Math::Color(1, 1, 1, alpha), pivot);
 	}
 
+	void DrawTex_Color(const KdTexture* tex, const Math::Rectangle& srcRect = { 0,0,0,0 }, const Math::Color C = {1,1,1,1}, const Math::Vector2& pivot = { 0.5, 0.5f })
+	{
+		if (tex == nullptr)return;
+		DrawTex(tex, 0, 0, srcRect.width, srcRect.height, &srcRect, &C, pivot);
+	}
+
 	//ÇSÅEÇTåéÇÃéˆã∆ópï∂éöï\é¶
 	void DrawString(float _x, float _y, const char _text[], const Math::Vector4& _color)
 	{

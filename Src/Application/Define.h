@@ -36,7 +36,7 @@ typedef enum
 	Poizon,
 	Conti,
 	SDust,
-	 SLight
+	BulletMax,
 }BulletTypeNum;
 
 typedef enum 
@@ -44,6 +44,8 @@ typedef enum
 	Title = 0,
 	Game,
 	Result,
+	LevelUp,
+	Select,
 };
 
 enum class EnemyState
@@ -54,4 +56,10 @@ enum class EnemyState
 	Dead,
 };
 
+typedef struct 
+{
+	int Cnt;
+	int Time;
+
+} WaponBullet;
 #define Cell Cell

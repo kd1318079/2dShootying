@@ -25,10 +25,10 @@ void Scene::Release()
 
 void Scene::ImGuiUpdate()
 {
-	//return;
+	return;
 
 	ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiSetCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiSetCond_Once);
 	static int A = 0;
 	// デバッグウィンドウ
 	if (ImGui::Begin("Debug Window"))
@@ -36,8 +36,11 @@ void Scene::ImGuiUpdate()
 		ImGui::Text("FPS : %d", APP.m_fps);
 		ImGui::Text("DisCnt : %d", PLAYER.ECnt);
 		ImGui::Text("PlayerSpd : %f", PLAYER.GetSpd());
-		ImGui::Text("PlayerSpd : %f", PLAYER.GetPDeg());
+		ImGui::Text("%f,%f",(float)GM.mousePos.x, (float)GM.mousePos.y);
 		ImGui::Text("ContiCnt : %d", PLAYER.ContiCnt);
+		ImGui::Text("Level : %d", PLAYER.Level);
+		ImGui::Text("Score : %d", PLAYER.Score);
+		ImGui::Text("Score : %f %f", PLAYER.GetPos().x, PLAYER.GetPos().y);
 		if(GM.AllEnemy.size() == 1)ImGui::Text("Enmey HP : %d", GM.AllEnemy[0]->HP);
 	}
 	ImGui::End();

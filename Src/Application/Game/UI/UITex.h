@@ -6,6 +6,7 @@ public:
 	UITex();
 	~UITex();
 	KdTexture* GetTex(int A) { return &UTex[A]; };
+	KdTexture* GetPowerTex(int A) { return &PowerTex[A]; };
 	static UITex& GetInstance()
 	{
 		static UITex instance;
@@ -13,26 +14,10 @@ public:
 	}
 private:
 	static const int UIMax = 33 + 1;
+	static const int PowerMax = 69+1;
 	KdTexture UTex[UIMax];
+	KdTexture PowerTex[PowerMax];
 
 };
-
-UITex::UITex()
-{
-	for (int i = 0; i < UIMax; i++)
-	{
-		char str[100];
-		sprintf_s(str, sizeof(str), "Texture/UI/UI%d.png", i);
-		UTex[i].Load(str);//scene.h‚É‚à‘‚¢‚½’Ê‚èƒLƒƒƒ‰–¼‚Æ“Y‚¦Žš‚ÅƒLƒƒƒ‰•Ê‚ÌTexture‚ð‚Â‚­‚é
-	}
-}
-
-UITex::~UITex()
-{
-	for (int i = 0; i < UIMax; i++)
-	{
-		UTex[i].Release();
-	}
-}
 
 #define UITEX UITex::GetInstance()

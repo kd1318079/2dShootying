@@ -15,6 +15,7 @@ Enemy::Enemy(int A)
 	Move = { 0,0 };
 	PScale = { 0.8,0.8 };
 	EState = EnemyState::Move;
+	cost = GM.CostSet(A);
 	SetStetas(A);
 	MatSet();
 }
@@ -65,26 +66,20 @@ void Enemy::Update()
 	}
 	if (ChainF)
 	{
-		std::cout << " " << std::endl;
-		for (int i = 0; i < ChainCnt; i++)
-		{
-			if (ChainHit(ChainPosA[ChainPosA.size() - 1]));
-			else ChainF = false;
-		}
+		
 		if (ChainF)
 		{
 			//自分が入ってるためまず消す
-			//ChainEnemy.erase(ChainEnemy.begin());
+			ChainEnemy.erase(ChainEnemy.begin());
 			for (auto A : ChainEnemy)
 			{
-				std::cout << A->Pos.x << " " << A->Pos.y << std::endl;
 				ChainCnt = 0;
 				Dmg--;
 				if (Dmg <= 0)Dmg = 1;
 				A->HP -= Dmg;
 				DeathUpdate(A);
 				A->Hit = true;
-				Dmgnum.push_back(new NumDraw({ Pos.x ,Pos.y }, Dmg));
+				Dmgnum.push_back(new NumDraw({ A->Pos.x ,A->Pos.y }, Dmg));
 
 			}
 			ChainEnemy.clear();
@@ -151,7 +146,7 @@ void Enemy::Update()
 		else ++A;
 	}
 
-	if (Dmgnum.size() >= 10)
+	if (Dmgnum.size() >= 5)
 	{
 		Dmgnum.erase(Dmgnum.begin()); // eraseは次の要素を指す有効なイテレーターを返します
 	}
@@ -227,16 +222,22 @@ void Enemy::ATHit(std::vector<Bullet*>& Bu)
 
 
 				Hit = true;
+				//チェイン
 				if ((*A)->BulletType == Chain)
 				{
 					ChainF = true;
-					ChainCnt = 5;
+					ChainCnt = 3;
 					ChainEnemy.clear();
 					ChainPosA.clear();
 					ChainPosB.clear();
-					Dmg = (*A)->GetATK();
+					Dmg = (*A)->GetATK() -DEF;
 					ChainPosA.push_back(Pos);
 					ChainEnemy.push_back(this);
+					for (int i = 0; i < ChainCnt; i++)
+					{
+						if (ChainHit(ChainPosA[ChainPosA.size() - 1]));
+						else ChainF = false;
+					}
 				}
 				PLAYER.ExpPos = (*A)->GetPos();
 				// BuからAを削除
@@ -334,12 +335,10 @@ bool Enemy::ChainHit(Math::Vector2 ChP)
 			float dx = ChP.x - A.x;
 			float dy = ChP.y - A.y;
 			float c = sqrt(dx * dx + dy * dy);
-			std::cout << "距離" << c << " Cnt"<< Cnt << std::endl;
 			if (c < *Dis && c != 0) // 最小値を更新する条件
 			{
 				*Dis = c;
 				*DCnt = Cnt;
-				std::cout << "DisCnt: " << *DCnt << std::endl;
 			}
 			return true;
 		};
@@ -426,6 +425,8 @@ void Enemy::DeathUpdate(Enemy* A)
 	if (A->HP <= 0)
 	{
 		A->HP = 0;
+		PLAYER.Score += A->ScoreP;
+
 		A->Exp = true;
 	}
 }
@@ -451,7 +452,7 @@ void Enemy::E_Update(int i)
 				break;
 			}
 			//ボス以外の時は画面外に
-			if (AttackUpdate(TypeNum))	ChangeState(EnemyState::Return, 600);
+			if (AttackUpdate(TypeNum))	ChangeState(EnemyState::Return, 200);
 			break;
 		}
 		case EnemyState::Return: if (ReturnUpdate(TypeNum))	ChangeState(EnemyState::Dead);			break;		//攻撃した後画面外に
@@ -667,10 +668,10 @@ void Enemy::Atk3()
 
 		PLAYER.EBullet.push_back(new EnemyBullet(Pos, 0, 2, 3));
 		int A = rand() % 3 + 1;
-
+		GM.Enemy5Cnt.clear();
+		GM.Enemy5PosCnt.clear();
 		GM.Enemy5Cnt.push_back(A);
 		GM.Enemy5PosCnt.push_back(Pos);
-
 	}
 
 	Timer += 2;
@@ -870,48 +871,57 @@ void Enemy::SetStetas(int A)
 		HP = 50;
 		ATK = 2;
 		DEF = 3;
+		ScoreP = 100;
 		break;
 	case 1:
 		HP = 30;
 		ATK = 2;
 		DEF = 3;
+		ScoreP = 100;
 		break;
 	case 2:
 		HP = 10;
 		ATK = 2;
 		DEF = 3;
+		ScoreP = 100;
 		break;
 	case 3:
 		HP = 20;
 		ATK = 2;
 		DEF = 3;
+		ScoreP = 100;
 		break;
 	case 4:
 		HP = 100;
 		ATK = 2;
 		DEF = 3;
+		ScoreP = 500;
 		break;
 	case 5:
 		HP = 5;
 		ATK = 2;
 		DEF = 2;
+		ScoreP = 50;
 		break;
 	case 6:
-		HP = 2000;
+		HP = 500;
 		ATK = 2;
 		DEF = 2;
 		Boss = true;
+		ScoreP = 1500;
 		break;
 	case 7:
 		HP = 2000;
 		ATK = 2;
 		DEF = 2;
+		ScoreP = 1500;
 		Boss = true;
 		break;
 	case 8:
 		HP = 2000;
 		ATK = 2;
 		DEF = 2;
+		ScoreP = 1500;
 		Boss = true;
 		break;
 	}

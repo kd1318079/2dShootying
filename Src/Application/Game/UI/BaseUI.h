@@ -3,11 +3,11 @@
 class BaseUI
 {
 public:
-	BaseUI(int i);
+	BaseUI() {};
 	~BaseUI() {};
 
 	virtual void Init() = 0;
-	void Update();
+	virtual void Update() = 0;
 	virtual void Draw() = 0;
 	virtual void Release() = 0;
 
@@ -21,12 +21,10 @@ protected:
 	Math::Matrix Trans;
 	Math::Matrix Mat;
 
+
+	Math::Vector2 Pos = {0,0};
+	Math::Vector2 Move = {0,0};
+	Math::Vector2 PScale = {1,1};
+
 	void MatSet();
-
-	Math::Vector2 Main;
-	Math::Vector2 Pos;
-	Math::Vector2 Move;
-	Math::Vector2 PScale;
-
-
 };

@@ -30,6 +30,11 @@ public:
 	bool MoonF = false;
 	bool SunF = false;
 	bool PoizonF = false;
+
+	//ワープは一度きり
+	bool WarpH = false;
+	bool WarpW = false;
+
 private:
 	float AutoDeg = 0;
 	//初期値の設定 //移動量の設定
@@ -99,8 +104,11 @@ private:
 	const float MissileSpd = 5;
 	Math::Vector2 MoveRad;
 
+
+
 public:
 	Math::Vector2 GetPos() { return Pos; };
+	void SetPos(Math::Vector2 A ) { Pos = A; };
 	int GetATK() { return Attack; };
 	Cell GetCell() { return BHitJ; }
 };
